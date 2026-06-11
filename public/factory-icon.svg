@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="180" fill="#2563eb"/>
+  <g transform="translate(212,232)" fill="none" stroke="#ffffff" stroke-width="56" stroke-linecap="round" stroke-linejoin="round">
+    <!-- factory outline (lucide Factory scaled 25x from 24px grid) -->
+    <path d="M50 500 V250 l175 100 V250 l175 100 V100 a25 25 0 0 1 25 -25 h125 a25 25 0 0 1 25 25 v400 Z"/>
+    <path d="M425 450 h50"/>
+    <path d="M250 450 h50"/>
+    <path d="M75 450 h50"/>
+  </g>
+</svg>
