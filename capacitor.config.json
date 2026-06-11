@@ -1,0 +1,8 @@
+{
+  "appId": "com.siupeter.factoryos",
+  "appName": "FactoryOS",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "automatic"
+  }
+}
