@@ -134,6 +134,14 @@ export async function getOrders() { return load().orders }
 export async function getBatches() { return load().batches }
 
 // ---- writes ----
+export async function createUser({ name, role }) {
+  const db = load()
+  const user = { id: uid('u'), name: name.trim(), role }
+  db.users.push(user)
+  save(db)
+  return user
+}
+
 export async function createCustomer(name) {
   const db = load()
   const customer = { id: uid('c'), name: name.trim() }
@@ -167,7 +175,7 @@ export async function updateProduct(id, patch) {
   return product
 }
 
-export async function createBatch({ productId, volumeL, number, note, user }) {
+export async function createBatch({ productId, volumeL, number, note, materials, user }) {
   const db = load()
   let batchNumber = (number || '').trim()
   if (!batchNumber) {
@@ -180,6 +188,9 @@ export async function createBatch({ productId, volumeL, number, note, user }) {
     productId,
     volumeL: Number(volumeL),
     note: note || '',
+    // per-ingredient usage: [{name, pct, plannedKg, actualKg}] — recorded
+    // against the formulation at production time
+    materials: materials || null,
     at: nowIso(),
     byName: user.name,
   }

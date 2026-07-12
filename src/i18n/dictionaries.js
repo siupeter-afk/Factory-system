@@ -29,6 +29,11 @@ export const en = {
   'login.title': 'Who is working?',
   'login.subtitle': 'Tap your name to start your shift',
   'login.footer': 'Signed-in sessions stay on this device',
+  'login.addWorker': 'Add worker',
+  'login.workerName': 'Name',
+  'login.position': 'Position',
+  'login.create': 'Add',
+  'login.errName': 'Enter a name',
 
   // Roles
   'role.owner': 'Owner',
@@ -125,6 +130,10 @@ export const en = {
   'batches.reserved': 'Reserved',
   'batches.errProduct': 'Choose a product',
   'batches.errVolume': 'Enter the batch volume in liters',
+  'batches.materials': 'Material Usage',
+  'batches.material': 'Material',
+  'batches.planned': 'Planned',
+  'batches.actual': 'Actual',
 
   // Stock in order form
   'newOrder.available': 'Available',
@@ -194,6 +203,11 @@ export const zh = {
   'login.title': '今天谁上班？',
   'login.subtitle': '点击你的名字开始工作',
   'login.footer': '登录状态会保存在本设备上',
+  'login.addWorker': '添加员工',
+  'login.workerName': '姓名',
+  'login.position': '岗位',
+  'login.create': '添加',
+  'login.errName': '请输入姓名',
 
   'role.owner': '老板',
   'role.operations': '运营',
@@ -282,6 +296,10 @@ export const zh = {
   'batches.reserved': '已预留',
   'batches.errProduct': '请选择产品',
   'batches.errVolume': '请输入批次体积（升）',
+  'batches.materials': '材料用量',
+  'batches.material': '材料',
+  'batches.planned': '计划用量',
+  'batches.actual': '实际用量',
 
   'newOrder.available': '可发货',
   'newOrder.insufficient': '超过可发货量',
