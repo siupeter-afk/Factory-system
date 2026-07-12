@@ -64,6 +64,11 @@ export function litersOf(line) {
   return Number(line.qty || 0) * (L_PER_UNIT[line.unit] ?? 0)
 }
 
+/** Volume that actually left the plant: the loaded amount when recorded, else the ordered qty. */
+export function shippedLitersOf(line) {
+  return Number(line.loadedQty ?? line.qty ?? 0) * (L_PER_UNIT[line.unit] ?? 0)
+}
+
 /**
  * Per-product volumes in liters:
  *  produced  – all batches ever recorded
@@ -77,7 +82,7 @@ export function computeStock(batches, orders) {
   batches.forEach(b => { bucket(b.productId).produced += Number(b.volumeL || 0) })
   orders.forEach(o => {
     if (['out_for_delivery', 'delivered'].includes(o.status)) {
-      o.lines.forEach(l => { bucket(l.productId).shipped += litersOf(l) })
+      o.lines.forEach(l => { bucket(l.productId).shipped += shippedLitersOf(l) })
     } else if (!['draft', 'cancelled'].includes(o.status)) {
       o.lines.forEach(l => { bucket(l.productId).reserved += litersOf(l) })
     }
@@ -217,13 +222,20 @@ export async function createOrder({ customerId, requestedDate, lines, notes, use
   return order
 }
 
-export async function advanceOrder(id, user) {
+export async function advanceOrder(id, user, payload) {
   const db = load()
   const order = db.orders.find(o => o.id === id)
   if (!order) throw new Error(`Order not found: ${id}`)
   if (!canAdvance(order, user.role)) throw new Error('Not permitted for this role')
   const next = nextStatus(order.status)
   if (!next) return order
+  // dispatch step: record actual loaded amount per line (blank = as ordered)
+  if (order.status === 'scheduled' && payload?.loadedQtys) {
+    order.lines = order.lines.map((l, i) => {
+      const v = payload.loadedQtys[i]
+      return v != null && v !== '' ? { ...l, loadedQty: Number(v) } : l
+    })
+  }
   order.status = next
   order.history.push({ status: next, at: nowIso(), byName: user.name })
   save(db)

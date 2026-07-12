@@ -86,6 +86,14 @@ export const en = {
   'order.created': 'Created',
   'order.by': 'by',
   'order.close': 'Close',
+  'order.loaded': 'loaded',
+
+  // Dispatch — actual loaded amounts
+  'dispatch.title': 'Dispatch — Actual Loaded',
+  'dispatch.hint': 'enter what was actually pumped into the truck',
+  'dispatch.ordered': 'Ordered',
+  'dispatch.blankNote': 'Leave blank if loaded exactly as ordered.',
+  'dispatch.confirm': 'Confirm dispatch',
 
   // New order form
   'newOrder.title': 'New Order',
@@ -255,6 +263,13 @@ export const zh = {
   'order.created': '创建',
   'order.by': '操作人',
   'order.close': '关闭',
+  'order.loaded': '已装载',
+
+  'dispatch.title': '发车 — 实际装载量',
+  'dispatch.hint': '请输入实际泵入货车的数量',
+  'dispatch.ordered': '订购量',
+  'dispatch.blankNote': '如按订购量装载，可留空。',
+  'dispatch.confirm': '确认发车',
 
   'newOrder.title': '新建订单',
   'newOrder.customer': '客户',

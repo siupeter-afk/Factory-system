@@ -182,6 +182,69 @@ function Queue({ orders, customers, user, onOpen, onAdvance, t, lang }) {
   )
 }
 
+function DispatchModal({ order, products, user, onClose, t }) {
+  const [loads, setLoads] = useState(order.lines.map(() => ''))
+  const productById = Object.fromEntries(products.map(p => [p.id, p]))
+
+  async function confirm() {
+    await advanceOrder(order.id, user, { loadedQtys: loads })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-ink/30" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+        <header className="flex items-center justify-between px-5 h-14 border-b border-line">
+          <h2 className="font-display font-semibold text-ink">{t('dispatch.title')}</h2>
+          <button onClick={onClose} aria-label={t('common.cancel')} className="p-2 text-muted hover:text-ink hover:bg-surface rounded-lg transition-colors">
+            <X size={18} />
+          </button>
+        </header>
+        <div className="p-5 flex flex-col gap-3">
+          <p className="text-sm text-muted -mt-1">{order.number} · {t('dispatch.hint')}</p>
+          {order.lines.map((l, i) => {
+            const p = productById[l.productId]
+            const diff = loads[i] !== '' && Number(loads[i]) !== Number(l.qty)
+            return (
+              <div key={i} className="border border-line rounded-xl p-3">
+                <p className="text-sm font-medium text-ink truncate">{p ? `${p.code} — ${p.name}` : l.productId}</p>
+                <div className="flex items-center gap-3 mt-2">
+                  <span className="text-xs text-muted tabular-nums">
+                    {t('dispatch.ordered')}: {Number(l.qty).toLocaleString()} {t(`unit.${l.unit}`)}
+                  </span>
+                  <div className="relative ml-auto w-36">
+                    <input
+                      type="number" min="0" step="1" inputMode="decimal"
+                      value={loads[i]}
+                      placeholder={String(l.qty)}
+                      onChange={e => setLoads(a => a.map((v, j) => (j === i ? e.target.value : v)))}
+                      className={`w-full px-2 py-2 pr-12 text-sm text-right border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand tabular-nums bg-white ${diff ? 'border-warn' : 'border-line'}`}
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted">{t(`unit.${l.unit}`)}</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+          <p className="text-xs text-muted">{t('dispatch.blankNote')}</p>
+        </div>
+        <footer className="p-4 border-t border-line flex gap-2">
+          <button
+            onClick={confirm}
+            className="flex-1 px-4 py-3 bg-brand text-white text-sm font-semibold rounded-xl hover:bg-brand-deep transition-colors"
+          >
+            {t('dispatch.confirm')}
+          </button>
+          <button onClick={onClose} className="px-4 py-3 text-muted text-sm font-semibold rounded-xl border border-line hover:bg-surface transition-colors">
+            {t('common.cancel')}
+          </button>
+        </footer>
+      </div>
+    </div>
+  )
+}
+
 function OrderDrawer({ order, customers, products, user, onClose, onAdvance, onCancel, t, lang }) {
   if (!order) return null
   const customer = customers.find(c => c.id === order.customerId)
@@ -216,14 +279,24 @@ function OrderDrawer({ order, customers, products, user, onClose, onAdvance, onC
             <div className="border border-line rounded-xl divide-y divide-line">
               {order.lines.map((l, i) => {
                 const p = productById[l.productId]
+                const loaded = l.loadedQty != null
+                const diff = loaded && Number(l.loadedQty) !== Number(l.qty)
                 return (
                   <div key={i} className="flex items-center justify-between px-3 py-2.5">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-ink truncate">{p?.name || l.productId}</p>
                       <p className="text-xs text-muted">{p?.code} · {t(`family.${p?.family}`)}</p>
                     </div>
-                    <span className="text-sm font-semibold text-ink tabular-nums shrink-0 pl-3">
-                      {l.qty} {t(`unit.${l.unit}`)}
+                    <span className="text-right shrink-0 pl-3">
+                      {diff && (
+                        <span className="block text-xs tabular-nums text-muted line-through">
+                          {Number(l.qty).toLocaleString()} {t(`unit.${l.unit}`)}
+                        </span>
+                      )}
+                      <span className="block text-sm font-semibold tabular-nums text-ink">
+                        {Number(loaded ? l.loadedQty : l.qty).toLocaleString()} {t(`unit.${l.unit}`)}
+                        {loaded && <span className={`font-normal text-xs ${diff ? 'text-warn' : 'text-muted'}`}> · {t('order.loaded')}</span>}
+                      </span>
                     </span>
                   </div>
                 )
@@ -451,6 +524,7 @@ export default function Orders() {
   const [query, setQuery] = useState('')
   const [openOrder, setOpenOrder] = useState(null)
   const [showNew, setShowNew] = useState(false)
+  const [dispatching, setDispatching] = useState(null)
 
   const customerById = useMemo(() => Object.fromEntries(customers.map(c => [c.id, c])), [customers])
   const stock = useMemo(() => computeStock(batches, orders), [batches, orders])
@@ -471,7 +545,11 @@ export default function Orders() {
   // Keep the drawer showing live data after advance/cancel
   const openLive = openOrder ? orders.find(o => o.id === openOrder.id) : null
 
-  const doAdvance = o => advanceOrder(o.id, user)
+  // Dispatching a scheduled order first asks for the actual loaded amounts
+  const doAdvance = o => {
+    if (o.status === 'scheduled') { setDispatching(o); return }
+    advanceOrder(o.id, user)
+  }
   const doCancel = o => cancelOrder(o.id, user).then(() => setOpenOrder(null))
   const canCreate = ['owner', 'operations'].includes(user.role)
 
@@ -533,6 +611,12 @@ export default function Orders() {
         <NewOrderModal
           customers={customers} products={products} stock={stock} user={user}
           onClose={() => setShowNew(false)} t={t}
+        />
+      )}
+      {dispatching && (
+        <DispatchModal
+          order={dispatching} products={products} user={user}
+          onClose={() => setDispatching(null)} t={t}
         />
       )}
     </div>
