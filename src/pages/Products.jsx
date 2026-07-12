@@ -245,7 +245,7 @@ export default function Products() {
 
   const canEdit = ['owner', 'operations', 'production', 'lab'].includes(user.role)
   const seesFormulation = canSeeFormulation(user.role)
-  const editsFormulation = ['owner', 'production', 'lab'].includes(user.role)
+  const editsFormulation = ['owner', 'production'].includes(user.role)
 
   return (
     <div className="p-6">

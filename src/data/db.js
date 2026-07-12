@@ -48,10 +48,10 @@ export function nextStatus(status) {
 }
 
 // ---- formulation visibility ----
-// Operations and drivers see only the product name; the recipe stays with
-// the people who make and test it.
+// The recipe stays with the owner and the people who make it.
+// Everyone else — including lab — sees only the product name.
 export function canSeeFormulation(role) {
-  return ['owner', 'production', 'lab'].includes(role)
+  return ['owner', 'production'].includes(role)
 }
 
 // ---- units & stock ----
