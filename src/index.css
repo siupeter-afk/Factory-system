@@ -1,10 +1,31 @@
+@import '@fontsource-variable/archivo';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* FactoryOS design tokens — cool blue-biased neutrals around the brand blue
+   already used in the app icon. Semantic colors are separate from the accent. */
+:root {
+  --c-brand: #2563eb;
+  --c-brand-deep: #1d4ed8;
+  --c-ink: #16202e;
+  --c-muted: #5a6a7e;
+  --c-line: #dbe2ec;
+  --c-surface: #f4f6fa;
+  --c-ok: #15803d;
+  --c-warn: #b45309;
+  --c-crit: #b91c1c;
+}
+
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-surface text-ink antialiased;
+    font-family: 'Archivo Variable', -apple-system, 'Segoe UI', system-ui,
+      'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
   }
 }
 

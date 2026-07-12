@@ -1,7 +1,10 @@
 import { useState } from 'react'
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
+import Login from './pages/Login'
+import Orders from './pages/Orders'
+import Products from './pages/Products'
 import Dashboard from './pages/Dashboard'
 import DocumentControl from './pages/DocumentControl'
 import NonConformances from './pages/NonConformances'
@@ -12,33 +15,60 @@ import Equipment from './pages/Equipment'
 import DataCollection from './pages/DataCollection'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
+import { AuthProvider, useAuth, homeFor } from './auth/AuthContext'
+import { I18nProvider, useI18n } from './i18n'
 
-const pageMeta = {
-  '/': { title: 'Dashboard', subtitle: 'Factory overview and KPI summary' },
-  '/compliance/documents': { title: 'Document Control', subtitle: 'Manage ISO procedures, manuals and work instructions' },
-  '/compliance/audits': { title: 'Audits', subtitle: 'Schedule and track internal, external and supplier audits' },
-  '/compliance/ncr': { title: 'Non-Conformances', subtitle: 'Log and manage non-conformance reports (NCRs)' },
-  '/compliance/capa': { title: 'CAPA', subtitle: 'Corrective and Preventive Action tracking' },
-  '/production': { title: 'Production', subtitle: 'Work orders, scheduling and quality inspections' },
-  '/equipment': { title: 'Equipment & Calibration', subtitle: 'Asset registry, maintenance and calibration schedules' },
-  '/data-collection': { title: 'Data Collection', subtitle: 'Digital forms for production and quality data entry' },
-  '/reports': { title: 'Reports & Analytics', subtitle: 'Compliance reports and KPI analysis' },
-  '/settings': { title: 'Settings', subtitle: 'Company configuration and system preferences' },
+// Routes each role may open. Deep links outside the list bounce to the role home.
+const ROLE_ROUTES = {
+  owner: null, // all
+  operations: ['/orders', '/products'],
+  production: ['/orders'],
+  lab: ['/orders'],
+  driver: ['/orders'],
+  engineering: ['/equipment'],
+  accountant: ['/reports', '/orders'],
 }
 
-function Layout() {
-  const [expanded, setExpanded] = useState(1)
+function pageMeta(t) {
+  return {
+    '/': { title: t('nav.dashboard'), subtitle: '' },
+    '/orders': { title: t('orders.title'), subtitle: t('orders.subtitle') },
+    '/products': { title: t('products.title'), subtitle: t('products.subtitle') },
+    '/compliance/documents': { title: t('nav.documents'), subtitle: '' },
+    '/compliance/audits': { title: t('nav.audits'), subtitle: '' },
+    '/compliance/ncr': { title: t('nav.ncr'), subtitle: '' },
+    '/compliance/capa': { title: t('nav.capa'), subtitle: '' },
+    '/production': { title: t('nav.production'), subtitle: '' },
+    '/equipment': { title: t('nav.equipment'), subtitle: '' },
+    '/data-collection': { title: t('nav.dataCollection'), subtitle: '' },
+    '/reports': { title: t('nav.reports'), subtitle: '' },
+    '/settings': { title: t('nav.settings'), subtitle: '' },
+  }
+}
+
+function Shell() {
+  const [expanded, setExpanded] = useState(null)
   const location = useLocation()
-  const meta = pageMeta[location.pathname] || { title: 'FactoryOS', subtitle: '' }
+  const { user } = useAuth()
+  const { t } = useI18n()
+
+  const allowed = ROLE_ROUTES[user.role]
+  if (allowed && !allowed.includes(location.pathname)) {
+    return <Navigate to={homeFor(user.role)} replace />
+  }
+
+  const meta = pageMeta(t)[location.pathname] || { title: t('app.name'), subtitle: '' }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-surface">
       <Sidebar expanded={expanded} setExpanded={setExpanded} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title={meta.title} subtitle={meta.subtitle} />
         <main className="flex-1 overflow-y-auto">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={user.role === 'owner' ? <Dashboard /> : <Navigate to={homeFor(user.role)} replace />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/products" element={<Products />} />
             <Route path="/compliance/documents" element={<DocumentControl />} />
             <Route path="/compliance/audits" element={<Audits />} />
             <Route path="/compliance/ncr" element={<NonConformances />} />
@@ -48,6 +78,7 @@ function Layout() {
             <Route path="/data-collection" element={<DataCollection />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to={homeFor(user.role)} replace />} />
           </Routes>
         </main>
       </div>
@@ -55,10 +86,19 @@ function Layout() {
   )
 }
 
+function Gate() {
+  const { user } = useAuth()
+  return user ? <Shell /> : <Login />
+}
+
 export default function App() {
   return (
-    <HashRouter>
-      <Layout />
-    </HashRouter>
+    <I18nProvider>
+      <AuthProvider>
+        <HashRouter>
+          <Gate />
+        </HashRouter>
+      </AuthProvider>
+    </I18nProvider>
   )
 }
