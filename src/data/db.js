@@ -394,6 +394,51 @@ export async function createAdjustment({ kind, materialId, productId, delta, rea
   return adjustment
 }
 
+/**
+ * Owner stocktake: set counted values for any number of materials (kg) and
+ * products (L) in one pass. Deltas against computed stock are booked as
+ * adjustments; one summary deviation records the whole count.
+ */
+export async function batchStocktake({ materialCounts = [], productCounts = [], note, user }) {
+  const db = load()
+  const matStock = computeMaterialStock(db.rawMaterials, db.receipts, db.batches, db.adjustments)
+  const prodStock = computeStock(db.batches, db.orders, db.adjustments)
+  const reason = note?.trim() || 'Stocktake'
+  let changed = 0
+
+  materialCounts.forEach(({ materialId, counted }) => {
+    const current = matStock[materialId]?.onHand ?? 0
+    const delta = Number(counted) - current
+    if (!delta) return
+    db.adjustments.push({
+      id: uid('a'), kind: 'material', materialId, productId: null,
+      delta, reason, at: nowIso(), byName: user.name,
+    })
+    changed += 1
+  })
+  productCounts.forEach(({ productId, counted }) => {
+    const current = prodStock[productId]?.available ?? 0
+    const delta = Number(counted) - current
+    if (!delta) return
+    db.adjustments.push({
+      id: uid('a'), kind: 'product', productId, materialId: null,
+      delta, reason, at: nowIso(), byName: user.name,
+    })
+    changed += 1
+  })
+
+  if (changed) {
+    pushDeviation(db, {
+      kind: 'stock_adjustment',
+      refId: null,
+      description: `${reason}: ${changed} item(s) corrected to counted values`,
+      byName: user.name,
+    })
+    save(db)
+  }
+  return changed
+}
+
 // ---- QC tests ----
 // stage: 'pot' | 'tank' | 'incoming'
 // results: [{param, unit, value, min, max, pass}] — overall pass = every param passes

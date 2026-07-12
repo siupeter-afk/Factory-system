@@ -22,6 +22,7 @@ export const en = {
   'nav.qc': 'QC Tests',
   'nav.forms': 'Forms',
   'nav.deviations': 'Deviations',
+  'nav.stocktake': 'Stocktake',
   'nav.equipment': 'Equipment',
   'nav.dataCollection': 'Data Collection',
   'nav.reports': 'Reports',
@@ -285,6 +286,16 @@ export const en = {
   'forms.errFields': 'Add at least one field',
   'forms.errRequired': 'Required',
 
+  // Stocktake
+  'stocktake.subtitle': 'Correct system stock to counted reality in one pass',
+  'stocktake.hint': 'Enter the counted value only where it differs — blank rows stay untouched. Deltas are booked as adjustments with a full audit trail.',
+  'stocktake.system': 'System',
+  'stocktake.counted': 'Counted',
+  'stocktake.delta': 'Correction',
+  'stocktake.notePlaceholder': 'Note, e.g. "Annual stocktake 2026"',
+  'stocktake.save': 'Book corrections',
+  'stocktake.saved': 'Corrections booked',
+
   // Deviations
   'deviations.subtitle': 'Off-plan usage, QC failures and stock corrections',
   'deviations.openTitle': 'Open',
@@ -332,6 +343,7 @@ export const zh = {
   'nav.qc': '质检',
   'nav.forms': '表单',
   'nav.deviations': '偏差记录',
+  'nav.stocktake': '库存盘点',
   'nav.equipment': '设备',
   'nav.dataCollection': '数据采集',
   'nav.reports': '报表',
@@ -579,6 +591,15 @@ export const zh = {
   'forms.errTitle': '请填写表单名称',
   'forms.errFields': '请至少添加一个字段',
   'forms.errRequired': '必填',
+
+  'stocktake.subtitle': '一次性将系统库存修正为实际盘点数',
+  'stocktake.hint': '只需在有差异的行填写盘点数 — 留空的行不会改动。差额会作为调整记录入账，保留完整审计痕迹。',
+  'stocktake.system': '系统数',
+  'stocktake.counted': '盘点数',
+  'stocktake.delta': '修正量',
+  'stocktake.notePlaceholder': '备注，如"2026 年度盘点"',
+  'stocktake.save': '入账修正',
+  'stocktake.saved': '修正已入账',
 
   'deviations.subtitle': '用料偏差、质检不合格与库存修正',
   'deviations.openTitle': '待处理',
