@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Plus, Search, X, ChevronRight, Columns3, ListChecks } from 'lucide-react'
 import {
-  getOrders, getCustomers, getProducts, subscribe,
+  getOrders, getCustomers, getProducts, getBatches, subscribe,
   createOrder, advanceOrder, cancelOrder, createCustomer,
   ORDER_FLOW, ADVANCE_ACTION, canAdvance, canCancel,
+  computeStock, litersOf,
 } from '../data/db'
 import { useAuth } from '../auth/AuthContext'
 import { useI18n } from '../i18n'
@@ -33,12 +34,12 @@ const isOverdue = o =>
   !['delivered', 'cancelled'].includes(o.status)
 
 function useFactoryData() {
-  const [data, setData] = useState({ orders: [], customers: [], products: [] })
+  const [data, setData] = useState({ orders: [], customers: [], products: [], batches: [] })
   useEffect(() => {
     let alive = true
     const refresh = () =>
-      Promise.all([getOrders(), getCustomers(), getProducts()]).then(
-        ([orders, customers, products]) => alive && setData({ orders, customers, products })
+      Promise.all([getOrders(), getCustomers(), getProducts(), getBatches()]).then(
+        ([orders, customers, products, batches]) => alive && setData({ orders, customers, products, batches })
       )
     refresh()
     const unsub = subscribe(refresh)
@@ -46,6 +47,8 @@ function useFactoryData() {
   }, [])
   return data
 }
+
+const fmtL = n => `${Number(n).toLocaleString()} L`
 
 function StatusPill({ status, t }) {
   const c = STATUS_COLOR[status]
@@ -68,7 +71,7 @@ function fmtDate(iso, lang) {
 
 function OrderCard({ order, customer, onOpen, onAdvance, user, t, lang }) {
   const overdue = isOverdue(order)
-  const qtyTotal = order.lines.reduce((s, l) => s + Number(l.qty || 0), 0)
+  const totalL = order.lines.reduce((s, l) => s + litersOf(l), 0)
   return (
     <button
       onClick={onOpen}
@@ -80,7 +83,7 @@ function OrderCard({ order, customer, onOpen, onAdvance, user, t, lang }) {
       <span className="flex-1 p-3 min-w-0">
         <span className="flex items-center justify-between gap-2">
           <span className="font-display font-semibold text-sm text-ink tabular-nums">{order.number}</span>
-          <span className="text-xs text-muted tabular-nums">{qtyTotal} {t('unit.t')}</span>
+          <span className="text-xs text-muted tabular-nums">{fmtL(totalL)}</span>
         </span>
         <span className="block text-sm text-ink truncate mt-0.5">{customer?.name}</span>
         <span className="flex items-center justify-between mt-2">
@@ -272,7 +275,7 @@ function OrderDrawer({ order, customers, products, user, onClose, onAdvance, onC
   )
 }
 
-function NewOrderModal({ customers, products, user, onClose, t }) {
+function NewOrderModal({ customers, products, stock, user, onClose, t }) {
   const [customerId, setCustomerId] = useState('')
   const [newCustomer, setNewCustomer] = useState('')
   const [addingCustomer, setAddingCustomer] = useState(false)
@@ -280,7 +283,7 @@ function NewOrderModal({ customers, products, user, onClose, t }) {
     const d = new Date(); d.setDate(d.getDate() + 3)
     return d.toISOString().slice(0, 10)
   })
-  const [lines, setLines] = useState([{ productId: '', qty: '', unit: 't' }])
+  const [lines, setLines] = useState([{ productId: '', qty: '', unit: 'l' }])
   const [notes, setNotes] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -353,34 +356,56 @@ function NewOrderModal({ customers, products, user, onClose, t }) {
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wide text-muted mb-1.5">{t('order.products')}</label>
             <div className="flex flex-col gap-2">
-              {lines.map((l, i) => (
-                <div key={i} className="flex gap-2">
-                  <select
-                    value={l.productId} onChange={e => setLine(i, { productId: e.target.value })}
-                    className="flex-1 min-w-0 px-3 py-2.5 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white"
-                  >
-                    <option value="">{t('newOrder.selectProduct')}</option>
-                    {activeProducts.map(p => <option key={p.id} value={p.id}>{p.code} — {p.name}</option>)}
-                  </select>
-                  <input
-                    type="number" min="0" step="0.1" value={l.qty} placeholder={t('newOrder.qty')}
-                    onChange={e => setLine(i, { qty: e.target.value })}
-                    className="w-20 px-2 py-2.5 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white tabular-nums"
-                  />
-                  <select
-                    value={l.unit} onChange={e => setLine(i, { unit: e.target.value })}
-                    className="w-24 px-2 py-2.5 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white"
-                  >
-                    {['t', 'kg', 'drum', 'ibc'].map(u => <option key={u} value={u}>{t(`unit.${u}`)}</option>)}
-                  </select>
-                  {lines.length > 1 && (
-                    <button onClick={() => setLines(ls => ls.filter((_, j) => j !== i))} aria-label="Remove line"
-                      className="p-2 text-muted hover:text-crit rounded-lg transition-colors">
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
-              ))}
+              {lines.map((l, i) => {
+                const s = l.productId ? stock[l.productId] : null
+                const available = s ? s.available - s.reserved : null
+                const wantL = litersOf(l)
+                const short = available != null && wantL > 0 && wantL > available
+                return (
+                  <div key={i}>
+                    <div className="flex gap-2">
+                      <select
+                        value={l.productId} onChange={e => setLine(i, { productId: e.target.value })}
+                        className="flex-1 min-w-0 px-3 py-2.5 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white"
+                      >
+                        <option value="">{t('newOrder.selectProduct')}</option>
+                        {activeProducts.map(p => {
+                          const ps = stock[p.id]
+                          const avail = ps ? ps.available - ps.reserved : 0
+                          return (
+                            <option key={p.id} value={p.id}>
+                              {p.code} — {p.name} · {fmtL(Math.max(avail, 0))}
+                            </option>
+                          )
+                        })}
+                      </select>
+                      <input
+                        type="number" min="0" step="100" value={l.qty} placeholder={t('newOrder.qty')}
+                        onChange={e => setLine(i, { qty: e.target.value })} inputMode="numeric"
+                        className="w-24 px-2 py-2.5 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white tabular-nums"
+                      />
+                      <select
+                        value={l.unit} onChange={e => setLine(i, { unit: e.target.value })}
+                        className="w-24 px-2 py-2.5 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white"
+                      >
+                        {['l', 'drum', 'ibc', 't', 'kg'].map(u => <option key={u} value={u}>{t(`unit.${u}`)}</option>)}
+                      </select>
+                      {lines.length > 1 && (
+                        <button onClick={() => setLines(ls => ls.filter((_, j) => j !== i))} aria-label="Remove line"
+                          className="p-2 text-muted hover:text-crit rounded-lg transition-colors">
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+                    {l.productId && (
+                      <p className={`text-xs mt-1 tabular-nums ${short ? 'text-warn font-medium' : 'text-muted'}`}>
+                        {t('newOrder.available')}: {fmtL(Math.max(available ?? 0, 0))}
+                        {short && ` — ${t('newOrder.insufficient')}`}
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
             <button
               onClick={() => setLines(ls => [...ls, { productId: '', qty: '', unit: 't' }])}
@@ -418,7 +443,7 @@ function NewOrderModal({ customers, products, user, onClose, t }) {
 }
 
 export default function Orders() {
-  const { orders, customers, products } = useFactoryData()
+  const { orders, customers, products, batches } = useFactoryData()
   const { user } = useAuth()
   const { t, lang } = useI18n()
   const roleQueue = ROLE_QUEUE[user.role]
@@ -428,6 +453,7 @@ export default function Orders() {
   const [showNew, setShowNew] = useState(false)
 
   const customerById = useMemo(() => Object.fromEntries(customers.map(c => [c.id, c])), [customers])
+  const stock = useMemo(() => computeStock(batches, orders), [batches, orders])
 
   const visible = useMemo(() => {
     let list = orders.filter(o => o.status !== 'cancelled')
@@ -505,7 +531,7 @@ export default function Orders() {
       )}
       {showNew && (
         <NewOrderModal
-          customers={customers} products={products} user={user}
+          customers={customers} products={products} stock={stock} user={user}
           onClose={() => setShowNew(false)} t={t}
         />
       )}

@@ -10,7 +10,7 @@ import DocumentControl from './pages/DocumentControl'
 import NonConformances from './pages/NonConformances'
 import CAPA from './pages/CAPA'
 import Audits from './pages/Audits'
-import Production from './pages/Production'
+import ProductionLog from './pages/ProductionLog'
 import Equipment from './pages/Equipment'
 import DataCollection from './pages/DataCollection'
 import Reports from './pages/Reports'
@@ -22,8 +22,8 @@ import { I18nProvider, useI18n } from './i18n'
 const ROLE_ROUTES = {
   owner: null, // all
   operations: ['/orders', '/products'],
-  production: ['/orders'],
-  lab: ['/orders'],
+  production: ['/orders', '/production', '/products'],
+  lab: ['/orders', '/products'],
   driver: ['/orders'],
   engineering: ['/equipment'],
   accountant: ['/reports', '/orders'],
@@ -38,7 +38,7 @@ function pageMeta(t) {
     '/compliance/audits': { title: t('nav.audits'), subtitle: '' },
     '/compliance/ncr': { title: t('nav.ncr'), subtitle: '' },
     '/compliance/capa': { title: t('nav.capa'), subtitle: '' },
-    '/production': { title: t('nav.production'), subtitle: '' },
+    '/production': { title: t('nav.productionLog'), subtitle: t('batches.subtitle') },
     '/equipment': { title: t('nav.equipment'), subtitle: '' },
     '/data-collection': { title: t('nav.dataCollection'), subtitle: '' },
     '/reports': { title: t('nav.reports'), subtitle: '' },
@@ -73,7 +73,7 @@ function Shell() {
             <Route path="/compliance/audits" element={<Audits />} />
             <Route path="/compliance/ncr" element={<NonConformances />} />
             <Route path="/compliance/capa" element={<CAPA />} />
-            <Route path="/production" element={<Production />} />
+            <Route path="/production" element={<ProductionLog />} />
             <Route path="/equipment" element={<Equipment />} />
             <Route path="/data-collection" element={<DataCollection />} />
             <Route path="/reports" element={<Reports />} />

@@ -13,11 +13,14 @@ function navFor(role, t) {
   const equipment = { to: '/equipment', icon: Wrench, label: t('nav.equipment') }
   const reports = { to: '/reports', icon: BarChart3, label: t('nav.reports') }
 
+  const productionLog = { to: '/production', icon: Factory, label: t('nav.productionLog') }
+
   switch (role) {
     case 'owner':
       return [
         { to: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
         orders,
+        productionLog,
         products,
         {
           label: t('nav.compliance'),
@@ -29,7 +32,6 @@ function navFor(role, t) {
             { to: '/compliance/capa', label: t('nav.capa') },
           ],
         },
-        { to: '/production', icon: Factory, label: t('nav.production') },
         equipment,
         { to: '/data-collection', icon: ClipboardList, label: t('nav.dataCollection') },
         reports,
@@ -37,9 +39,16 @@ function navFor(role, t) {
     case 'operations':
       return [orders, products]
     case 'production':
-      return [{ ...orders, icon: Factory, label: t('nav.productionQueue') }]
+      return [
+        { ...orders, icon: ClipboardList, label: t('nav.productionQueue') },
+        productionLog,
+        products,
+      ]
     case 'lab':
-      return [{ ...orders, icon: FlaskConical, label: t('nav.qcQueue') }]
+      return [
+        { ...orders, icon: FlaskConical, label: t('nav.qcQueue') },
+        products,
+      ]
     case 'driver':
       return [{ ...orders, icon: Truck, label: t('nav.deliveries') }]
     case 'engineering':
