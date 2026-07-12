@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, ShieldCheck, Wrench, ClipboardList, BarChart3,
   Settings, Factory, ChevronRight, PackageOpen, FlaskConical, Truck, Beaker,
+  Boxes, FileSpreadsheet, AlertTriangle,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useI18n } from '../i18n'
@@ -14,6 +15,10 @@ function navFor(role, t) {
   const reports = { to: '/reports', icon: BarChart3, label: t('nav.reports') }
 
   const productionLog = { to: '/production', icon: Factory, label: t('nav.productionLog') }
+  const materials = { to: '/materials', icon: Boxes, label: t('nav.materials') }
+  const qc = { to: '/qc', icon: FlaskConical, label: t('nav.qc') }
+  const forms = { to: '/forms', icon: FileSpreadsheet, label: t('nav.forms') }
+  const deviations = { to: '/deviations', icon: AlertTriangle, label: t('nav.deviations') }
 
   switch (role) {
     case 'owner':
@@ -21,7 +26,11 @@ function navFor(role, t) {
         { to: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
         orders,
         productionLog,
+        materials,
+        qc,
         products,
+        forms,
+        deviations,
         {
           label: t('nav.compliance'),
           icon: ShieldCheck,
@@ -33,30 +42,36 @@ function navFor(role, t) {
           ],
         },
         equipment,
-        { to: '/data-collection', icon: ClipboardList, label: t('nav.dataCollection') },
         reports,
       ]
     case 'operations':
-      return [orders, products]
+      return [orders, materials, products, forms]
     case 'production':
       return [
         { ...orders, icon: ClipboardList, label: t('nav.productionQueue') },
         productionLog,
+        materials,
         products,
+        forms,
+        deviations,
       ]
     case 'lab':
       return [
-        { ...orders, icon: FlaskConical, label: t('nav.qcQueue') },
+        qc,
+        { ...orders, icon: PackageOpen, label: t('nav.qcQueue') },
+        materials,
         products,
+        forms,
+        deviations,
       ]
     case 'driver':
-      return [{ ...orders, icon: Truck, label: t('nav.deliveries') }]
+      return [{ ...orders, icon: Truck, label: t('nav.deliveries') }, forms]
     case 'engineering':
-      return [equipment]
+      return [equipment, forms]
     case 'accountant':
-      return [reports, orders]
+      return [reports, orders, forms]
     default:
-      return [orders]
+      return [orders, forms]
   }
 }
 

@@ -20,10 +20,25 @@ export const seedUsers = [
 // A representative sample of the 50+ product catalog. Formulations are
 // placeholders — production/lab replace them with the real recipes.
 // Formulation contents are only shown to owner/production/lab (see db.canSeeFormulation).
+// Specs are QC ranges the lab tests against (owned by lab). Formulations are
+// versioned; v1 timestamps are seed placeholders.
+const SPEC_WR = [
+  { param: 'Density', unit: 'g/cm³', min: 1.06, max: 1.10 },
+  { param: 'Solids content', unit: '%', min: 38, max: 42 },
+  { param: 'pH', unit: '', min: 5.5, max: 7.5 },
+  { param: 'Flowability', unit: 'mm', min: 220, max: 280 },
+]
+const SPEC_FA = [
+  { param: 'Density', unit: 'g/cm³', min: 1.02, max: 1.06 },
+  { param: 'Foam density', unit: 'kg/m³', min: 40, max: 60 },
+  { param: 'pH', unit: '', min: 6.0, max: 8.0 },
+]
+
 export const seedProducts = [
   {
     id: 'p-wr360', code: 'WR-360', name: 'Polycarboxylate Superplasticizer PC-360', family: 'water_reducer', active: true,
     formulation: {
+      version: 1,
       ingredients: [
         { name: 'Polycarboxylic ether (50%)', pct: 40 },
         { name: 'Water', pct: 58.5 },
@@ -31,40 +46,92 @@ export const seedProducts = [
         { name: 'Preservative', pct: 1 },
       ],
       notes: 'Placeholder recipe — replace with the controlled formulation.',
+      updatedAt: null, updatedBy: null,
     },
+    formulationHistory: [],
+    specs: SPEC_WR,
   },
   {
     id: 'p-wr210', code: 'WR-210', name: 'Naphthalene Water Reducer N-210', family: 'water_reducer', active: true,
     formulation: {
+      version: 1,
       ingredients: [
         { name: 'Sodium naphthalene sulfonate', pct: 32 },
         { name: 'Water', pct: 66 },
         { name: 'Sodium gluconate', pct: 2 },
       ],
       notes: '',
+      updatedAt: null, updatedBy: null,
     },
+    formulationHistory: [],
+    specs: SPEC_WR,
   },
-  { id: 'p-wr115', code: 'WR-115', name: 'Lignosulfonate Plasticizer L-115', family: 'water_reducer', active: true, formulation: null },
+  { id: 'p-wr115', code: 'WR-115', name: 'Lignosulfonate Plasticizer L-115', family: 'water_reducer', active: true, formulation: null, formulationHistory: [], specs: SPEC_WR },
   {
     id: 'p-fa102', code: 'FA-102', name: 'Protein Foaming Agent FA-102', family: 'foaming_agent', active: true,
     formulation: {
+      version: 1,
       ingredients: [
         { name: 'Hydrolyzed protein concentrate', pct: 28 },
         { name: 'Water', pct: 70 },
         { name: 'Stabilizer', pct: 2 },
       ],
       notes: 'Placeholder recipe.',
+      updatedAt: null, updatedBy: null,
     },
+    formulationHistory: [],
+    specs: SPEC_FA,
   },
-  { id: 'p-fa205', code: 'FA-205', name: 'Synthetic Foaming Agent FA-205', family: 'foaming_agent', active: true, formulation: null },
-  { id: 'p-rt450', code: 'RT-450', name: 'Sugar-based Retarder RT-450', family: 'retarder', active: true, formulation: null },
-  { id: 'p-rt460', code: 'RT-460', name: 'Phosphate Retarder RT-460', family: 'retarder', active: true, formulation: null },
-  { id: 'p-ac710', code: 'AC-710', name: 'Alkali-free Accelerator AC-710', family: 'accelerator', active: true, formulation: null },
-  { id: 'p-ac720', code: 'AC-720', name: 'Sodium Silicate Accelerator AC-720', family: 'accelerator', active: true, formulation: null },
-  { id: 'p-ae330', code: 'AE-330', name: 'Air Entrainer AE-330', family: 'air_entrainer', active: true, formulation: null },
-  { id: 'p-wp510', code: 'WP-510', name: 'Crystalline Waterproofing WP-510', family: 'waterproofing', active: true, formulation: null },
-  { id: 'p-ci610', code: 'CI-610', name: 'Corrosion Inhibitor CI-610', family: 'corrosion_inhibitor', active: true, formulation: null },
-  { id: 'p-vm810', code: 'VM-810', name: 'Viscosity Modifier VM-810', family: 'viscosity_modifier', active: true, formulation: null },
+  { id: 'p-fa205', code: 'FA-205', name: 'Synthetic Foaming Agent FA-205', family: 'foaming_agent', active: true, formulation: null, formulationHistory: [], specs: SPEC_FA },
+  { id: 'p-rt450', code: 'RT-450', name: 'Sugar-based Retarder RT-450', family: 'retarder', active: true, formulation: null, formulationHistory: [], specs: [] },
+  { id: 'p-rt460', code: 'RT-460', name: 'Phosphate Retarder RT-460', family: 'retarder', active: true, formulation: null, formulationHistory: [], specs: [] },
+  { id: 'p-ac710', code: 'AC-710', name: 'Alkali-free Accelerator AC-710', family: 'accelerator', active: true, formulation: null, formulationHistory: [], specs: [] },
+  { id: 'p-ac720', code: 'AC-720', name: 'Sodium Silicate Accelerator AC-720', family: 'accelerator', active: true, formulation: null, formulationHistory: [], specs: [] },
+  { id: 'p-ae330', code: 'AE-330', name: 'Air Entrainer AE-330', family: 'air_entrainer', active: true, formulation: null, formulationHistory: [], specs: [] },
+  { id: 'p-wp510', code: 'WP-510', name: 'Crystalline Waterproofing WP-510', family: 'waterproofing', active: true, formulation: null, formulationHistory: [], specs: [] },
+  { id: 'p-ci610', code: 'CI-610', name: 'Corrosion Inhibitor CI-610', family: 'corrosion_inhibitor', active: true, formulation: null, formulationHistory: [], specs: [] },
+  { id: 'p-vm810', code: 'VM-810', name: 'Viscosity Modifier VM-810', family: 'viscosity_modifier', active: true, formulation: null, formulationHistory: [], specs: [] },
+]
+
+// Raw materials — names must match formulation ingredient names for
+// automatic stock draw-down. Levels in kg.
+export const seedRawMaterials = [
+  { id: 'm-pce', name: 'Polycarboxylic ether (50%)', minLevelKg: 5000 },
+  { id: 'm-sns', name: 'Sodium naphthalene sulfonate', minLevelKg: 3000 },
+  { id: 'm-glu', name: 'Sodium gluconate', minLevelKg: 500 },
+  { id: 'm-protein', name: 'Hydrolyzed protein concentrate', minLevelKg: 1000 },
+  { id: 'm-stab', name: 'Stabilizer', minLevelKg: 200 },
+  { id: 'm-defoam', name: 'Defoamer', minLevelKg: 100 },
+  { id: 'm-preserv', name: 'Preservative', minLevelKg: 100 },
+  { id: 'm-water', name: 'Water', minLevelKg: 0 },
+]
+
+export const seedReceipts = [
+  { id: 'r-101', number: 'RCV-101', materialId: 'm-pce', supplier: 'ChemSource Ltd.', lotNo: 'PCE-2606-18', qtyKg: 12000, note: '', qcStatus: 'passed', at: daysFromNow(-10), byName: 'Amy' },
+  { id: 'r-102', number: 'RCV-102', materialId: 'm-sns', supplier: 'Northern Chemical', lotNo: 'SNS-0611', qtyKg: 8000, note: '', qcStatus: 'passed', at: daysFromNow(-6), byName: 'Amy' },
+  { id: 'r-103', number: 'RCV-103', materialId: 'm-protein', supplier: 'BioPro Materials', lotNo: 'HP-2288', qtyKg: 2000, note: '', qcStatus: 'pending', at: daysFromNow(0), byName: 'Amy' },
+]
+
+// One ready-made form so the Forms page isn't empty on first run.
+export const seedFormTemplates = [
+  {
+    id: 'f-tankclean',
+    title: 'Tank Cleaning Checklist',
+    department: 'production',
+    version: 1,
+    fields: [
+      { id: 'fld-tank', label: 'Tank number', type: 'text', required: true },
+      { id: 'fld-date', label: 'Cleaning date', type: 'date', required: true },
+      { id: 'fld-method', label: 'Method', type: 'select', options: ['Water rinse', 'Caustic wash', 'Full CIP'], required: true },
+      { id: 'fld-residue', label: 'Residue check passed', type: 'checkbox', required: false },
+      { id: 'fld-ph', label: 'Rinse water pH', type: 'number', unit: '', min: 6, max: 8, required: false },
+      { id: 'fld-notes', label: 'Notes', type: 'text', required: false },
+    ],
+    active: true,
+    history: [],
+    at: daysFromNow(-3),
+    byName: 'Peter',
+  },
 ]
 
 export const seedCustomers = [

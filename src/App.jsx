@@ -11,6 +11,10 @@ import NonConformances from './pages/NonConformances'
 import CAPA from './pages/CAPA'
 import Audits from './pages/Audits'
 import ProductionLog from './pages/ProductionLog'
+import Materials from './pages/Materials'
+import QC from './pages/QC'
+import Forms from './pages/Forms'
+import Deviations from './pages/Deviations'
 import Equipment from './pages/Equipment'
 import DataCollection from './pages/DataCollection'
 import Reports from './pages/Reports'
@@ -21,12 +25,12 @@ import { I18nProvider, useI18n } from './i18n'
 // Routes each role may open. Deep links outside the list bounce to the role home.
 const ROLE_ROUTES = {
   owner: null, // all
-  operations: ['/orders', '/products'],
-  production: ['/orders', '/production', '/products'],
-  lab: ['/orders', '/products'],
-  driver: ['/orders'],
-  engineering: ['/equipment'],
-  accountant: ['/reports', '/orders'],
+  operations: ['/orders', '/materials', '/products', '/forms'],
+  production: ['/orders', '/production', '/materials', '/products', '/forms', '/deviations'],
+  lab: ['/qc', '/orders', '/materials', '/products', '/forms', '/deviations'],
+  driver: ['/orders', '/forms'],
+  engineering: ['/equipment', '/forms'],
+  accountant: ['/reports', '/orders', '/forms'],
 }
 
 function pageMeta(t) {
@@ -39,6 +43,10 @@ function pageMeta(t) {
     '/compliance/ncr': { title: t('nav.ncr'), subtitle: '' },
     '/compliance/capa': { title: t('nav.capa'), subtitle: '' },
     '/production': { title: t('nav.productionLog'), subtitle: t('batches.subtitle') },
+    '/materials': { title: t('nav.materials'), subtitle: t('materials.subtitle') },
+    '/qc': { title: t('nav.qc'), subtitle: t('qc.subtitle') },
+    '/forms': { title: t('nav.forms'), subtitle: t('forms.subtitle') },
+    '/deviations': { title: t('nav.deviations'), subtitle: t('deviations.subtitle') },
     '/equipment': { title: t('nav.equipment'), subtitle: '' },
     '/data-collection': { title: t('nav.dataCollection'), subtitle: '' },
     '/reports': { title: t('nav.reports'), subtitle: '' },
@@ -74,6 +82,10 @@ function Shell() {
             <Route path="/compliance/ncr" element={<NonConformances />} />
             <Route path="/compliance/capa" element={<CAPA />} />
             <Route path="/production" element={<ProductionLog />} />
+            <Route path="/materials" element={<Materials />} />
+            <Route path="/qc" element={<QC />} />
+            <Route path="/forms" element={<Forms />} />
+            <Route path="/deviations" element={<Deviations />} />
             <Route path="/equipment" element={<Equipment />} />
             <Route path="/data-collection" element={<DataCollection />} />
             <Route path="/reports" element={<Reports />} />

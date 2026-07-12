@@ -42,7 +42,7 @@ export function homeFor(role) {
     case 'owner': return '/'
     case 'operations': return '/orders'
     case 'production': return '/orders'
-    case 'lab': return '/orders'
+    case 'lab': return '/qc'
     case 'driver': return '/orders'
     case 'engineering': return '/equipment'
     case 'accountant': return '/reports'

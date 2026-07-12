@@ -153,7 +153,7 @@ function AddProductModal({ onClose, withFormulation, t }) {
   )
 }
 
-function FormulationPanel({ product, canEdit, t }) {
+function FormulationPanel({ product, canEdit, user, t }) {
   const [editing, setEditing] = useState(false)
   const [ingredients, setIngredients] = useState(
     product.formulation?.ingredients?.length ? product.formulation.ingredients : [{ name: '', pct: '' }]
@@ -164,13 +164,14 @@ function FormulationPanel({ product, canEdit, t }) {
     const rows = ingredients
       .filter(r => String(r.name).trim())
       .map(r => ({ name: String(r.name).trim(), pct: Number(r.pct) || 0 }))
-    await updateProduct(product.id, { formulation: { ingredients: rows, notes: notes.trim() } })
+    // versioned in the data layer: prior recipe moves to formulationHistory
+    await updateProduct(product.id, { formulation: { ingredients: rows, notes: notes.trim() } }, user)
     setEditing(false)
   }
 
   if (editing) {
     return (
-      <div className="px-4 py-4 bg-surface/60">
+      <div>
         <IngredientRows ingredients={ingredients} setIngredients={setIngredients} t={t} />
         <input
           value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('products.formulationNotes')}
@@ -190,7 +191,14 @@ function FormulationPanel({ product, canEdit, t }) {
 
   const f = product.formulation
   return (
-    <div className="px-4 py-4 bg-surface/60">
+    <div>
+      {f && (
+        <p className="text-xs text-muted mb-2 tabular-nums">
+          {t('products.version')} {f.version}
+          {f.updatedBy ? ` · ${f.updatedBy}` : ''}
+          {product.formulationHistory?.length ? ` · ${product.formulationHistory.length} ${t('products.priorVersions')}` : ''}
+        </p>
+      )}
       {f?.ingredients?.length ? (
         <table className="text-sm max-w-md w-full">
           <tbody className="divide-y divide-line/60">
@@ -208,6 +216,99 @@ function FormulationPanel({ product, canEdit, t }) {
       {f?.notes && <p className="text-xs text-muted mt-2">{f.notes}</p>}
       {canEdit && (
         <button onClick={() => setEditing(true)} className="mt-3 text-xs font-medium text-brand hover:underline">
+          {t('products.edit')}
+        </button>
+      )}
+    </div>
+  )
+}
+
+// QC spec ranges — visible to everyone with page access, edited by lab/owner
+function SpecsPanel({ product, canEdit, user, t }) {
+  const [editing, setEditing] = useState(false)
+  const [rows, setRows] = useState(
+    product.specs?.length ? product.specs.map(s => ({ ...s })) : [{ param: '', unit: '', min: '', max: '' }]
+  )
+
+  const setRow = (i, patch) => setRows(rs => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)))
+
+  async function saveEdit() {
+    const cleaned = rows
+      .filter(r => String(r.param).trim())
+      .map(r => ({
+        param: String(r.param).trim(),
+        unit: String(r.unit || '').trim(),
+        min: r.min === '' || r.min == null ? null : Number(r.min),
+        max: r.max === '' || r.max == null ? null : Number(r.max),
+      }))
+    await updateProduct(product.id, { specs: cleaned }, user)
+    setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <div className="mb-4">
+        <div className="flex flex-col gap-2">
+          {rows.map((r, i) => (
+            <div key={i} className="flex gap-2">
+              <input value={r.param} onChange={e => setRow(i, { param: e.target.value })}
+                placeholder={t('products.specParam')}
+                className="flex-1 min-w-0 px-3 py-2 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white" />
+              <input value={r.unit} onChange={e => setRow(i, { unit: e.target.value })}
+                placeholder={t('forms.unit')}
+                className="w-20 px-2 py-2 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white" />
+              <input type="number" step="any" value={r.min ?? ''} onChange={e => setRow(i, { min: e.target.value })}
+                placeholder={t('forms.min')}
+                className="w-24 px-2 py-2 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand tabular-nums bg-white" />
+              <input type="number" step="any" value={r.max ?? ''} onChange={e => setRow(i, { max: e.target.value })}
+                placeholder={t('forms.max')}
+                className="w-24 px-2 py-2 text-sm border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand tabular-nums bg-white" />
+              {rows.length > 1 && (
+                <button onClick={() => setRows(rs => rs.filter((_, j) => j !== i))} aria-label={t('common.cancel')}
+                  className="p-2 text-muted hover:text-crit rounded-lg transition-colors">
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        <button onClick={() => setRows(rs => [...rs, { param: '', unit: '', min: '', max: '' }])}
+          className="mt-2 text-xs font-medium text-brand hover:underline">
+          {t('products.addSpec')}
+        </button>
+        <div className="flex gap-2 mt-3">
+          <button onClick={saveEdit} className="px-4 py-2 bg-brand text-white text-xs font-semibold rounded-lg hover:bg-brand-deep transition-colors">
+            {t('products.save')}
+          </button>
+          <button onClick={() => setEditing(false)} className="px-4 py-2 text-muted text-xs font-semibold rounded-lg border border-line hover:bg-white transition-colors">
+            {t('common.cancel')}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mb-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-2">{t('products.specs')}</p>
+      {product.specs?.length ? (
+        <table className="text-sm max-w-md w-full">
+          <tbody className="divide-y divide-line/60">
+            {product.specs.map((s, i) => (
+              <tr key={i}>
+                <td className="py-1.5 text-ink">{s.param}{s.unit ? ` (${s.unit})` : ''}</td>
+                <td className="py-1.5 text-right tabular-nums text-ink font-medium whitespace-nowrap">
+                  {s.min ?? '—'} – {s.max ?? '—'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="text-sm text-muted">{t('products.noSpecs')}</p>
+      )}
+      {canEdit && (
+        <button onClick={() => setEditing(true)} className="mt-2 text-xs font-medium text-brand hover:underline">
           {t('products.edit')}
         </button>
       )}
@@ -246,6 +347,8 @@ export default function Products() {
   const canEdit = ['owner', 'operations', 'production', 'lab'].includes(user.role)
   const seesFormulation = canSeeFormulation(user.role)
   const editsFormulation = ['owner', 'production'].includes(user.role)
+  const editsSpecs = ['owner', 'lab'].includes(user.role)
+  const canExpand = canEdit // specs visible to any editing role; formulation stays gated inside
 
   return (
     <div className="p-6">
@@ -272,7 +375,7 @@ export default function Products() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-line text-left">
-                {seesFormulation && <th className="w-8" />}
+                {canExpand && <th className="w-8" />}
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted">{t('products.code')}</th>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted">{t('products.name')}</th>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted">{t('products.family')}</th>
@@ -288,11 +391,11 @@ export default function Products() {
                 return (
                   <FragmentRow key={p.id}>
                     <tr className={p.active ? '' : 'opacity-50'}>
-                      {seesFormulation && (
+                      {canExpand && (
                         <td className="pl-3">
                           <button
                             onClick={() => setOpenRow(open ? null : p.id)}
-                            aria-label={t('products.formulation')}
+                            aria-label={t('products.details')}
                             aria-expanded={open}
                             className="p-1 text-muted hover:text-brand rounded transition-colors"
                           >
@@ -341,10 +444,20 @@ export default function Products() {
                         )}
                       </td>
                     </tr>
-                    {seesFormulation && open && (
+                    {canExpand && open && (
                       <tr>
                         <td colSpan={6} className="p-0 border-t border-line/60">
-                          <FormulationPanel product={p} canEdit={editsFormulation} t={t} />
+                          <div className="px-4 py-4 bg-surface/60">
+                            <SpecsPanel product={p} canEdit={editsSpecs} user={user} t={t} />
+                            {seesFormulation && (
+                              <>
+                                <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-1 flex items-center gap-1.5">
+                                  <Lock size={11} /> {t('products.formulation')}
+                                </p>
+                                <FormulationPanel product={p} canEdit={editsFormulation} user={user} t={t} />
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     )}

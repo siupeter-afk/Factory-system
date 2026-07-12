@@ -545,10 +545,14 @@ export default function Orders() {
   // Keep the drawer showing live data after advance/cancel
   const openLive = openOrder ? orders.find(o => o.id === openOrder.id) : null
 
-  // Dispatching a scheduled order first asks for the actual loaded amounts
+  // Dispatching a scheduled order first asks for the actual loaded amounts.
+  // QC release can be refused by the gate: every product needs a released batch.
   const doAdvance = o => {
     if (o.status === 'scheduled') { setDispatching(o); return }
-    advanceOrder(o.id, user)
+    advanceOrder(o.id, user).catch(e => {
+      if (e.qcBlocked) window.alert(`${t('qc.blocked')}: ${e.qcBlocked.join(', ')}`)
+      else throw e
+    })
   }
   const doCancel = o => cancelOrder(o.id, user).then(() => setOpenOrder(null))
   const canCreate = ['owner', 'operations'].includes(user.role)
