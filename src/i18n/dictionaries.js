@@ -39,6 +39,11 @@ export const en = {
   'login.position': 'Position',
   'login.create': 'Add',
   'login.errName': 'Enter a name',
+  'login.manage': 'Manage workers',
+  'login.doneManaging': 'Done',
+  'login.manageHint': 'Tap a worker to remove them. Their past records stay in history.',
+  'login.confirmRemove': 'Remove this worker?',
+  'login.errLastOwner': 'Cannot remove the last owner account.',
 
   // Roles
   'role.owner': 'Owner',
@@ -359,6 +364,11 @@ export const zh = {
   'login.position': '岗位',
   'login.create': '添加',
   'login.errName': '请输入姓名',
+  'login.manage': '管理员工',
+  'login.doneManaging': '完成',
+  'login.manageHint': '点击员工卡片将其移除，其历史记录会保留。',
+  'login.confirmRemove': '确定移除该员工？',
+  'login.errLastOwner': '无法移除最后一个老板账号。',
 
   'role.owner': '老板',
   'role.operations': '运营',

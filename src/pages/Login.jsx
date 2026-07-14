@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Factory, Languages, UserPlus, X } from 'lucide-react'
-import { getUsers, createUser, subscribe } from '../data/db'
+import { Factory, Languages, UserPlus, UserCog, X } from 'lucide-react'
+import { getUsers, createUser, deleteUser, subscribe } from '../data/db'
 import { useAuth } from '../auth/AuthContext'
 import { useI18n } from '../i18n'
 
@@ -86,8 +86,19 @@ function AddWorkerModal({ onClose, t }) {
 export default function Login() {
   const [users, setUsers] = useState([])
   const [showAdd, setShowAdd] = useState(false)
+  const [managing, setManaging] = useState(false)
   const { signIn } = useAuth()
   const { t, toggle } = useI18n()
+
+  async function remove(u) {
+    if (!window.confirm(`${t('login.confirmRemove')} — ${u.name}`)) return
+    try {
+      await deleteUser(u.id)
+    } catch (e) {
+      if (e.message === 'LAST_OWNER') window.alert(t('login.errLastOwner'))
+      else throw e
+    }
+  }
 
   useEffect(() => {
     let alive = true
@@ -122,37 +133,59 @@ export default function Login() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-3xl w-full">
         {users.map(u => (
-          <button
-            key={u.id}
-            onClick={() => signIn(u)}
-            className="group bg-white border border-line rounded-2xl p-5 flex flex-col items-center gap-3
-                       hover:border-brand hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand
-                       outline-none transition-all min-h-[132px]"
-          >
-            <span className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-display font-bold ${ROLE_TINT[u.role] || 'bg-slate-500 text-white'}`}>
-              {u.name.charAt(0)}
-            </span>
-            <span className="text-center">
-              <span className="block text-sm font-semibold text-ink">{u.name}</span>
-              <span className="block text-xs text-muted mt-0.5">{t(`role.${u.role}`)}</span>
-            </span>
-          </button>
+          <div key={u.id} className="relative">
+            <button
+              onClick={() => (managing ? remove(u) : signIn(u))}
+              className={`group w-full bg-white border rounded-2xl p-5 flex flex-col items-center gap-3
+                         focus-visible:ring-2 outline-none transition-all min-h-[132px] ${
+                           managing
+                             ? 'border-crit/40 hover:border-crit hover:shadow-md focus-visible:ring-crit'
+                             : 'border-line hover:border-brand hover:shadow-md focus-visible:ring-brand'
+                         }`}
+            >
+              <span className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-display font-bold ${managing ? 'opacity-60 ' : ''}${ROLE_TINT[u.role] || 'bg-slate-500 text-white'}`}>
+                {u.name.charAt(0)}
+              </span>
+              <span className="text-center">
+                <span className="block text-sm font-semibold text-ink">{u.name}</span>
+                <span className="block text-xs text-muted mt-0.5">{t(`role.${u.role}`)}</span>
+              </span>
+            </button>
+            {managing && (
+              <span className="absolute -top-2 -right-2 w-7 h-7 bg-crit text-white rounded-full flex items-center justify-center shadow pointer-events-none">
+                <X size={15} />
+              </span>
+            )}
+          </div>
         ))}
 
-        <button
-          onClick={() => setShowAdd(true)}
-          className="border-2 border-dashed border-line rounded-2xl p-5 flex flex-col items-center justify-center gap-3
-                     text-muted hover:text-brand hover:border-brand focus-visible:ring-2 focus-visible:ring-brand
-                     outline-none transition-all min-h-[132px]"
-        >
-          <span className="w-14 h-14 rounded-full flex items-center justify-center bg-surface">
-            <UserPlus size={22} />
-          </span>
-          <span className="text-sm font-semibold">{t('login.addWorker')}</span>
-        </button>
+        {!managing && (
+          <button
+            onClick={() => setShowAdd(true)}
+            className="border-2 border-dashed border-line rounded-2xl p-5 flex flex-col items-center justify-center gap-3
+                       text-muted hover:text-brand hover:border-brand focus-visible:ring-2 focus-visible:ring-brand
+                       outline-none transition-all min-h-[132px]"
+          >
+            <span className="w-14 h-14 rounded-full flex items-center justify-center bg-surface">
+              <UserPlus size={22} />
+            </span>
+            <span className="text-sm font-semibold">{t('login.addWorker')}</span>
+          </button>
+        )}
       </div>
 
-      <p className="text-xs text-muted mt-10">{t('login.footer')}</p>
+      <button
+        onClick={() => setManaging(v => !v)}
+        className={`mt-8 flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+          managing ? 'text-brand bg-brand/10' : 'text-muted hover:text-ink hover:bg-white'
+        }`}
+      >
+        <UserCog size={15} />
+        {managing ? t('login.doneManaging') : t('login.manage')}
+      </button>
+      {managing && <p className="text-xs text-crit mt-2">{t('login.manageHint')}</p>}
+
+      <p className="text-xs text-muted mt-6">{t('login.footer')}</p>
 
       {showAdd && <AddWorkerModal onClose={() => setShowAdd(false)} t={t} />}
     </div>

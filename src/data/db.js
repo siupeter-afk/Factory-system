@@ -235,6 +235,19 @@ export async function createUser({ name, role }) {
   return user
 }
 
+export async function deleteUser(id) {
+  const db = load()
+  const user = db.users.find(u => u.id === id)
+  if (!user) return
+  // records reference users by name, so history is unaffected by removal —
+  // but the app must always keep at least one owner account
+  if (user.role === 'owner' && db.users.filter(u => u.role === 'owner').length === 1) {
+    throw new Error('LAST_OWNER')
+  }
+  db.users = db.users.filter(u => u.id !== id)
+  save(db)
+}
+
 export async function createCustomer(name) {
   const db = load()
   const customer = { id: uid('c'), name: name.trim() }
