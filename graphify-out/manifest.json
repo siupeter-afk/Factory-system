@@ -1,0 +1,257 @@
+{
+  "/home/user/Factory-system/capacitor.config.json": {
+    "mtime": 1781142323.7306027,
+    "ast_hash": "7a55526b46ac493a35bd342438a24d00",
+    "semantic_hash": "7a55526b46ac493a35bd342438a24d00"
+  },
+  "/home/user/Factory-system/ios/App/App/AppDelegate.swift": {
+    "mtime": 1780415704.0,
+    "ast_hash": "b2865a48d0e54c1613fa58272418bf98",
+    "semantic_hash": "b2865a48d0e54c1613fa58272418bf98"
+  },
+  "/home/user/Factory-system/ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json": {
+    "mtime": 1780415704.0,
+    "ast_hash": "7453c3002126811a57c38b2740f990cf",
+    "semantic_hash": "7453c3002126811a57c38b2740f990cf"
+  },
+  "/home/user/Factory-system/ios/App/App/Assets.xcassets/Contents.json": {
+    "mtime": 1780415704.0,
+    "ast_hash": "31cc68f34934a99c0b0c1bebde56309c",
+    "semantic_hash": "31cc68f34934a99c0b0c1bebde56309c"
+  },
+  "/home/user/Factory-system/ios/App/App/Assets.xcassets/Splash.imageset/Contents.json": {
+    "mtime": 1780415704.0,
+    "ast_hash": "1162e1cddd7ea769bcacdd1aa7b4ac72",
+    "semantic_hash": "1162e1cddd7ea769bcacdd1aa7b4ac72"
+  },
+  "/home/user/Factory-system/ios/App/App/capacitor.config.json": {
+    "mtime": 1781142331.6986027,
+    "ast_hash": "35a3421c488e343cdeb2a5220a09c93b",
+    "semantic_hash": "35a3421c488e343cdeb2a5220a09c93b"
+  },
+  "/home/user/Factory-system/ios/App/App/public/assets/index-BHZwvLMV.js": {
+    "mtime": 1781142331.6632721,
+    "ast_hash": "e1e0ab533d706d80e8a602fbe498c1f0",
+    "semantic_hash": "e1e0ab533d706d80e8a602fbe498c1f0"
+  },
+  "/home/user/Factory-system/ios/App/App/public/cordova.js": {
+    "mtime": 1781142331.6866026,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/user/Factory-system/ios/App/App/public/cordova_plugins.js": {
+    "mtime": 1781142331.6866026,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/user/Factory-system/ios/App/App/public/sw.js": {
+    "mtime": 1781142331.6613872,
+    "ast_hash": "2867455f8b65518846c80473a1e7bed1",
+    "semantic_hash": "2867455f8b65518846c80473a1e7bed1"
+  },
+  "/home/user/Factory-system/ios/App/CapApp-SPM/Package.swift": {
+    "mtime": 1781142331.6906025,
+    "ast_hash": "1907cb00c0779dee24bffee0ee187eac",
+    "semantic_hash": "1907cb00c0779dee24bffee0ee187eac"
+  },
+  "/home/user/Factory-system/ios/App/CapApp-SPM/Sources/CapApp-SPM/CapApp-SPM.swift": {
+    "mtime": 1780415704.0,
+    "ast_hash": "0d92cb44a62bc3f2d73464a2e4f9a890",
+    "semantic_hash": "0d92cb44a62bc3f2d73464a2e4f9a890"
+  },
+  "/home/user/Factory-system/package.json": {
+    "mtime": 1781142315.426603,
+    "ast_hash": "aca52a8578a6d816ab3549439e770045",
+    "semantic_hash": "aca52a8578a6d816ab3549439e770045"
+  },
+  "/home/user/Factory-system/postcss.config.js": {
+    "mtime": 1779507867.4535534,
+    "ast_hash": "ef3ba2a81ba19f8ea5ddf625521e96f0",
+    "semantic_hash": "ef3ba2a81ba19f8ea5ddf625521e96f0"
+  },
+  "/home/user/Factory-system/public/sw.js": {
+    "mtime": 1781142214.6906052,
+    "ast_hash": "2867455f8b65518846c80473a1e7bed1",
+    "semantic_hash": "2867455f8b65518846c80473a1e7bed1"
+  },
+  "/home/user/Factory-system/src/App.jsx": {
+    "mtime": 1781142237.2586048,
+    "ast_hash": "f0c0e2998f75cc94f7a3bf1f0e88a667",
+    "semantic_hash": "f0c0e2998f75cc94f7a3bf1f0e88a667"
+  },
+  "/home/user/Factory-system/src/components/Header.jsx": {
+    "mtime": 1779507972.1135492,
+    "ast_hash": "024aa05f076b1ab58ded071ad6ddd772",
+    "semantic_hash": "024aa05f076b1ab58ded071ad6ddd772"
+  },
+  "/home/user/Factory-system/src/components/Sidebar.jsx": {
+    "mtime": 1779507964.4655495,
+    "ast_hash": "a46cffa74c64038dd4835c46c47f4f9b",
+    "semantic_hash": "a46cffa74c64038dd4835c46c47f4f9b"
+  },
+  "/home/user/Factory-system/src/data/mockData.js": {
+    "mtime": 1779507944.7415502,
+    "ast_hash": "88b1d9aaa3cb1273fe7e251284554e30",
+    "semantic_hash": "88b1d9aaa3cb1273fe7e251284554e30"
+  },
+  "/home/user/Factory-system/src/main.jsx": {
+    "mtime": 1781142229.4746048,
+    "ast_hash": "7c6f5a1cf6431c515c7255c21dc11bdf",
+    "semantic_hash": "7c6f5a1cf6431c515c7255c21dc11bdf"
+  },
+  "/home/user/Factory-system/src/pages/Audits.jsx": {
+    "mtime": 1779508109.1895435,
+    "ast_hash": "64a22818f287d71f5532dae70afad8de",
+    "semantic_hash": "64a22818f287d71f5532dae70afad8de"
+  },
+  "/home/user/Factory-system/src/pages/CAPA.jsx": {
+    "mtime": 1779508073.917545,
+    "ast_hash": "cc8c4ea07b8315ed1ae051bbdf4c61b7",
+    "semantic_hash": "cc8c4ea07b8315ed1ae051bbdf4c61b7"
+  },
+  "/home/user/Factory-system/src/pages/Dashboard.jsx": {
+    "mtime": 1779508000.537548,
+    "ast_hash": "f6163ee81e9ecd9ecc3bfeb67780307f",
+    "semantic_hash": "f6163ee81e9ecd9ecc3bfeb67780307f"
+  },
+  "/home/user/Factory-system/src/pages/DataCollection.jsx": {
+    "mtime": 1779508202.76554,
+    "ast_hash": "c9765d6b52a08ff174f41e4de5918022",
+    "semantic_hash": "c9765d6b52a08ff174f41e4de5918022"
+  },
+  "/home/user/Factory-system/src/pages/DocumentControl.jsx": {
+    "mtime": 1779508024.4255471,
+    "ast_hash": "3bc13b60925920a4e66ec938e22d192f",
+    "semantic_hash": "3bc13b60925920a4e66ec938e22d192f"
+  },
+  "/home/user/Factory-system/src/pages/Equipment.jsx": {
+    "mtime": 1779508167.3255413,
+    "ast_hash": "f86a86a5b7c922c74bdd40f0cfb79079",
+    "semantic_hash": "f86a86a5b7c922c74bdd40f0cfb79079"
+  },
+  "/home/user/Factory-system/src/pages/NonConformances.jsx": {
+    "mtime": 1779508050.677546,
+    "ast_hash": "421f839a496e2c0d663609faa8d70c40",
+    "semantic_hash": "421f839a496e2c0d663609faa8d70c40"
+  },
+  "/home/user/Factory-system/src/pages/Production.jsx": {
+    "mtime": 1779508141.1455424,
+    "ast_hash": "e9815df1b078e086fd713bf2a23d70a3",
+    "semantic_hash": "e9815df1b078e086fd713bf2a23d70a3"
+  },
+  "/home/user/Factory-system/src/pages/Reports.jsx": {
+    "mtime": 1779508228.9615388,
+    "ast_hash": "3339e3c701df8d1dc3b8e5853e3dafb7",
+    "semantic_hash": "3339e3c701df8d1dc3b8e5853e3dafb7"
+  },
+  "/home/user/Factory-system/src/pages/Settings.jsx": {
+    "mtime": 1779508249.661538,
+    "ast_hash": "7f49d95664853ff20a2d7fea75c6d196",
+    "semantic_hash": "7f49d95664853ff20a2d7fea75c6d196"
+  },
+  "/home/user/Factory-system/tailwind.config.js": {
+    "mtime": 1779507871.089553,
+    "ast_hash": "06d12c62d9d44bf8a42b87fddd3c4cbb",
+    "semantic_hash": "06d12c62d9d44bf8a42b87fddd3c4cbb"
+  },
+  "/home/user/Factory-system/vite.config.js": {
+    "mtime": 1781142239.0186048,
+    "ast_hash": "838092f86b51aa33311493a7797d351b",
+    "semantic_hash": "838092f86b51aa33311493a7797d351b"
+  },
+  "/home/user/Factory-system/.github/workflows/deploy.yml": {
+    "mtime": 1781142248.4546044,
+    "ast_hash": "8bd4cee03973239b04afd53d86781f4b",
+    "semantic_hash": "8bd4cee03973239b04afd53d86781f4b"
+  },
+  "/home/user/Factory-system/README.md": {
+    "mtime": 1779507756.0438914,
+    "ast_hash": "68971be6fd8f030319956f51cc2394ea",
+    "semantic_hash": "68971be6fd8f030319956f51cc2394ea"
+  },
+  "/home/user/Factory-system/index.html": {
+    "mtime": 1781142222.6506052,
+    "ast_hash": "d4d7cf7b9e0806545eb3dddeccea1fca",
+    "semantic_hash": "d4d7cf7b9e0806545eb3dddeccea1fca"
+  },
+  "/home/user/Factory-system/ios/App/App/public/index.html": {
+    "mtime": 1781142331.6615322,
+    "ast_hash": "92330b1a77b2bab255af9b2662b7f718",
+    "semantic_hash": "92330b1a77b2bab255af9b2662b7f718"
+  },
+  "/home/user/Factory-system/ios/App/CapApp-SPM/README.md": {
+    "mtime": 1780415704.0,
+    "ast_hash": "d256f6b5922d4249607779141357d565",
+    "semantic_hash": "d256f6b5922d4249607779141357d565"
+  },
+  "/home/user/Factory-system/ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png": {
+    "mtime": 1781142349.5099044,
+    "ast_hash": "38b1a213afec332025397e130eba7529",
+    "semantic_hash": "38b1a213afec332025397e130eba7529"
+  },
+  "/home/user/Factory-system/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-1.png": {
+    "mtime": 1780415704.0,
+    "ast_hash": "958532b95c3e7d4997327dc977b80600",
+    "semantic_hash": "958532b95c3e7d4997327dc977b80600"
+  },
+  "/home/user/Factory-system/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-2.png": {
+    "mtime": 1780415704.0,
+    "ast_hash": "958532b95c3e7d4997327dc977b80600",
+    "semantic_hash": "958532b95c3e7d4997327dc977b80600"
+  },
+  "/home/user/Factory-system/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732.png": {
+    "mtime": 1780415704.0,
+    "ast_hash": "958532b95c3e7d4997327dc977b80600",
+    "semantic_hash": "958532b95c3e7d4997327dc977b80600"
+  },
+  "/home/user/Factory-system/ios/App/App/public/apple-touch-icon.png": {
+    "mtime": 1781142331.6616712,
+    "ast_hash": "a5fc8d1d6a91fc3b0f814e4234d458d7",
+    "semantic_hash": "a5fc8d1d6a91fc3b0f814e4234d458d7"
+  },
+  "/home/user/Factory-system/ios/App/App/public/factory-icon.svg": {
+    "mtime": 1781142331.6614826,
+    "ast_hash": "96b9af866a296b5933d508f8c14be8c9",
+    "semantic_hash": "96b9af866a296b5933d508f8c14be8c9"
+  },
+  "/home/user/Factory-system/ios/App/App/public/pwa-1024.png": {
+    "mtime": 1781142331.6615918,
+    "ast_hash": "38b1a213afec332025397e130eba7529",
+    "semantic_hash": "38b1a213afec332025397e130eba7529"
+  },
+  "/home/user/Factory-system/ios/App/App/public/pwa-192.png": {
+    "mtime": 1781142331.6613429,
+    "ast_hash": "4fbe054d6396de2bbc1c66b4aa2fc41f",
+    "semantic_hash": "4fbe054d6396de2bbc1c66b4aa2fc41f"
+  },
+  "/home/user/Factory-system/ios/App/App/public/pwa-512.png": {
+    "mtime": 1781142331.6615918,
+    "ast_hash": "335b9ae8168dbaed14b2f18fc9f6e55f",
+    "semantic_hash": "335b9ae8168dbaed14b2f18fc9f6e55f"
+  },
+  "/home/user/Factory-system/public/apple-touch-icon.png": {
+    "mtime": 1781142185.974606,
+    "ast_hash": "a5fc8d1d6a91fc3b0f814e4234d458d7",
+    "semantic_hash": "a5fc8d1d6a91fc3b0f814e4234d458d7"
+  },
+  "/home/user/Factory-system/public/factory-icon.svg": {
+    "mtime": 1781142198.8448179,
+    "ast_hash": "96b9af866a296b5933d508f8c14be8c9",
+    "semantic_hash": "96b9af866a296b5933d508f8c14be8c9"
+  },
+  "/home/user/Factory-system/public/pwa-1024.png": {
+    "mtime": 1781142185.998606,
+    "ast_hash": "38b1a213afec332025397e130eba7529",
+    "semantic_hash": "38b1a213afec332025397e130eba7529"
+  },
+  "/home/user/Factory-system/public/pwa-192.png": {
+    "mtime": 1781142185.978606,
+    "ast_hash": "4fbe054d6396de2bbc1c66b4aa2fc41f",
+    "semantic_hash": "4fbe054d6396de2bbc1c66b4aa2fc41f"
+  },
+  "/home/user/Factory-system/public/pwa-512.png": {
+    "mtime": 1781142185.986606,
+    "ast_hash": "335b9ae8168dbaed14b2f18fc9f6e55f",
+    "semantic_hash": "335b9ae8168dbaed14b2f18fc9f6e55f"
+  }
+}
