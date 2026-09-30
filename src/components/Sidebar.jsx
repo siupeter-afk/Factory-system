@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, ShieldCheck, Wrench, ClipboardList, BarChart3,
   Settings, Factory, ChevronRight, PackageOpen, FlaskConical, Truck, Beaker,
-  Boxes, FileSpreadsheet, AlertTriangle, ClipboardCheck,
+  Boxes, FileSpreadsheet, AlertTriangle, ClipboardCheck, TestTubes,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useI18n } from '../i18n'
@@ -19,6 +19,7 @@ function navFor(role, t) {
   const qc = { to: '/qc', icon: FlaskConical, label: t('nav.qc') }
   const forms = { to: '/forms', icon: FileSpreadsheet, label: t('nav.forms') }
   const deviations = { to: '/deviations', icon: AlertTriangle, label: t('nav.deviations') }
+  const mixDesign = { to: '/mix-design', icon: TestTubes, label: t('nav.mixDesign') }
 
   switch (role) {
     case 'owner':
@@ -29,6 +30,7 @@ function navFor(role, t) {
         materials,
         { to: '/stocktake', icon: ClipboardCheck, label: t('nav.stocktake') },
         qc,
+        mixDesign,
         products,
         forms,
         deviations,
@@ -59,6 +61,7 @@ function navFor(role, t) {
     case 'lab':
       return [
         qc,
+        mixDesign,
         { ...orders, icon: PackageOpen, label: t('nav.qcQueue') },
         materials,
         products,

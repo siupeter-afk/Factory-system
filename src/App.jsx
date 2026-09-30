@@ -16,6 +16,7 @@ import QC from './pages/QC'
 import Forms from './pages/Forms'
 import Deviations from './pages/Deviations'
 import Stocktake from './pages/Stocktake'
+import MixDesign from './pages/MixDesign'
 import Equipment from './pages/Equipment'
 import DataCollection from './pages/DataCollection'
 import Reports from './pages/Reports'
@@ -28,7 +29,7 @@ const ROLE_ROUTES = {
   owner: null, // all
   operations: ['/orders', '/materials', '/products', '/forms'],
   production: ['/orders', '/production', '/materials', '/products', '/forms', '/deviations'],
-  lab: ['/qc', '/orders', '/materials', '/products', '/forms', '/deviations'],
+  lab: ['/qc', '/mix-design', '/orders', '/materials', '/products', '/forms', '/deviations'],
   driver: ['/orders', '/forms'],
   engineering: ['/equipment', '/forms'],
   accountant: ['/reports', '/orders', '/forms'],
@@ -49,6 +50,7 @@ function pageMeta(t) {
     '/forms': { title: t('nav.forms'), subtitle: t('forms.subtitle') },
     '/deviations': { title: t('nav.deviations'), subtitle: t('deviations.subtitle') },
     '/stocktake': { title: t('nav.stocktake'), subtitle: t('stocktake.subtitle') },
+    '/mix-design': { title: t('nav.mixDesign'), subtitle: t('mix.subtitle') },
     '/equipment': { title: t('nav.equipment'), subtitle: '' },
     '/data-collection': { title: t('nav.dataCollection'), subtitle: '' },
     '/reports': { title: t('nav.reports'), subtitle: '' },
@@ -89,6 +91,7 @@ function Shell() {
             <Route path="/forms" element={<Forms />} />
             <Route path="/deviations" element={<Deviations />} />
             <Route path="/stocktake" element={user.role === 'owner' ? <Stocktake /> : <Navigate to={homeFor(user.role)} replace />} />
+            <Route path="/mix-design" element={<MixDesign />} />
             <Route path="/equipment" element={<Equipment />} />
             <Route path="/data-collection" element={<DataCollection />} />
             <Route path="/reports" element={<Reports />} />

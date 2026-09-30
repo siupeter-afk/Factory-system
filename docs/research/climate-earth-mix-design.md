@@ -1,6 +1,6 @@
 # Climate Earth mix design: research notes and a local build plan
 
-Status: research only. No code written yet. See "Decision needed" at the bottom.
+Status: decided (a) lab R&D, plus some (b) for close R&D partners. Phase 1 is built: see section 6.
 
 ## 1. What "ClimaEarth" actually is
 
@@ -78,10 +78,37 @@ Phase 1 (fits the current React/Vite + local db architecture, no ML):
 Phase 2 (after roughly 50+ trial mixes exist): export to CSV in BOxCrete's column format, and fit the GP offline
 in Python. Don't put PyTorch in the iPad app.
 
-## 6. Decision needed
+## 6. Decision and what was built
 
-Which of (a), (b) or (c) is this for? If the answer is "we want Climate Earth's AI", that's the wrong
-target: without our own break data, a local model gives confident-looking guesses.
+The decision was **(a)**, plus some **(b)** for close partners we do R&D with.
+
+Phase 1 ships as the **Trial Mixes** screen (`/mix-design`), for lab and owner:
+- `src/data/mix.js` holds pure calculations, tested in `src/data/mix.test.js` (`npm test`):
+  - absolute volumes, yield check, and w/cm (including water carried in by the admixture)
+  - fill-aggregates-to-1-m³ at a chosen sand ratio
+  - linear GWP estimate
+  - strength by age (mean and SD)
+  - trial-vs-reference comparison
+  - BOxCrete CSV rows
+- Trial mixes are **immutable designs**. A changed design is a new mix, so every break belongs to the
+  proportions that produced it. "Start from existing mix" makes variations quick.
+- Each mix can be tagged with a partner (an existing customer) and a reference/control mix.
+- The printable partner report is a side-by-side table against the reference with the "not an EPD" disclaimer.
+- CSV export is in BOxCrete's column format (psi, inches), filtered by partner.
+- Specific gravities and emission factors are editable. The defaults are placeholders.
+
+Deliberately **not** built yet:
+- **Tarantula gradation check.** Its per-sieve limits are unverified (section 2). Admixture R&D usually
+  holds aggregates fixed, so it matters less for (a).
+- **ACI 211 water-demand and coarse-aggregate tables.** The lab enters water and binder directly
+  and varies them against a reference. Table look-ups from memory would be a liability.
+- **Strength prediction.** Revisit once there are about 50+ mixes with 28-day breaks.
+
+Open risks:
+- **Partner confidentiality.** The report shows our product code and dosage. That's fine for close partners,
+  but anything wider needs a decision on what to disclose.
+- **Data sits in one browser's localStorage** until the Supabase move. That's a real risk for R&D data you
+  intend to model later. Export CSV regularly until then.
 
 ## Sources
 - Climate Earth AI Mix Design Suite: https://climateearth.com/solutions/ai-mix-design-suite

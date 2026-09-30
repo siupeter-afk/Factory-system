@@ -6,6 +6,7 @@ import {
   seedUsers, seedProducts, seedCustomers, seedOrders, seedBatches,
   seedRawMaterials, seedReceipts, seedFormTemplates,
 } from './seed'
+import { DEFAULT_SG, DEFAULT_GWP } from './mix'
 
 const DB_KEY = 'factoryos-db-v3'
 
@@ -166,6 +167,9 @@ function load() {
       db.formSubmissions ??= []
       db.counters.batch ??= 1006
       db.counters.receipt ??= 100
+      db.trialMixes ??= []
+      db.mixSettings ??= { sg: { ...DEFAULT_SG }, gwp: { ...DEFAULT_GWP } }
+      db.counters.trialMix ??= 1000
       return db
     }
   } catch { /* corrupted -> reseed */ }
@@ -182,7 +186,9 @@ function load() {
     deviations: [],
     formTemplates: seedFormTemplates,
     formSubmissions: [],
-    counters: { order: 1008, batch: 1006, receipt: 103 },
+    trialMixes: [],
+    mixSettings: { sg: { ...DEFAULT_SG }, gwp: { ...DEFAULT_GWP } },
+    counters: { order: 1008, batch: 1006, receipt: 103, trialMix: 1000 },
   }
   localStorage.setItem(DB_KEY, JSON.stringify(fresh))
   return fresh
@@ -225,6 +231,8 @@ export async function getQcTests() { return load().qcTests }
 export async function getDeviations() { return load().deviations }
 export async function getFormTemplates() { return load().formTemplates }
 export async function getFormSubmissions() { return load().formSubmissions }
+export async function getTrialMixes() { return load().trialMixes }
+export async function getMixSettings() { return load().mixSettings }
 
 // ---- users / customers ----
 export async function createUser({ name, role }) {
@@ -569,6 +577,74 @@ export async function submitForm({ templateId, values, user }) {
   db.formSubmissions.push(submission)
   save(db)
   return submission
+}
+
+// ---- trial concrete mixes (lab R&D) ----
+// mix: { number, title, partnerId (customer we co-develop with, or null),
+//   productId (our admixture), dosagePct (% of binder mass), admixtureSolidsPct,
+//   admixtureGwp (kg CO₂e/kg, overrides the default), referenceId (control mix),
+//   materials: {cement, flyAsh, slag, water, fineAgg, coarseAgg} kg/m³, airPct,
+//   targetMpa, targetSlumpMm, fresh: {slumpMm, airPct, tempC, densityKgM3},
+//   breaks: [{ageDays, mpa, at, byName}], notes }
+// Designs are fixed once cast — a changed design is a new trial mix, so breaks
+// always belong to the proportions that produced them.
+export async function createTrialMix(mix, user) {
+  const db = load()
+  db.counters.trialMix += 1
+  const record = {
+    id: uid('tm'),
+    number: `TM-${db.counters.trialMix}`,
+    title: mix.title?.trim() || '',
+    partnerId: mix.partnerId || null,
+    productId: mix.productId || null,
+    dosagePct: mix.dosagePct === '' ? 0 : Number(mix.dosagePct || 0),
+    admixtureSolidsPct: mix.admixtureSolidsPct === '' ? null : mix.admixtureSolidsPct ?? null,
+    admixtureGwp: mix.admixtureGwp === '' ? null : mix.admixtureGwp ?? null,
+    referenceId: mix.referenceId || null,
+    materials: mix.materials,
+    airPct: Number(mix.airPct || 0),
+    targetMpa: mix.targetMpa === '' ? null : mix.targetMpa ?? null,
+    targetSlumpMm: mix.targetSlumpMm === '' ? null : mix.targetSlumpMm ?? null,
+    fresh: {},
+    breaks: [],
+    notes: mix.notes?.trim() || '',
+    at: nowIso(),
+    byName: user.name,
+  }
+  db.trialMixes.push(record)
+  save(db)
+  return record
+}
+
+export async function recordFreshProperties(id, fresh, user) {
+  const db = load()
+  const mix = db.trialMixes.find(m => m.id === id)
+  if (!mix) throw new Error(`Trial mix not found: ${id}`)
+  mix.fresh = { ...fresh, at: nowIso(), byName: user.name }
+  save(db)
+  return mix
+}
+
+/** Add cube/cylinder breaks for one age: values = [MPa, …]. */
+export async function addStrengthBreaks(id, { ageDays, values }, user) {
+  const db = load()
+  const mix = db.trialMixes.find(m => m.id === id)
+  if (!mix) throw new Error(`Trial mix not found: ${id}`)
+  values.forEach(v => {
+    mix.breaks.push({ ageDays: Number(ageDays), mpa: Number(v), at: nowIso(), byName: user.name })
+  })
+  save(db)
+  return mix
+}
+
+export async function updateMixSettings({ sg, gwp }) {
+  const db = load()
+  db.mixSettings = {
+    sg: { ...db.mixSettings.sg, ...sg },
+    gwp: { ...db.mixSettings.gwp, ...gwp },
+  }
+  save(db)
+  return db.mixSettings
 }
 
 // ---- orders ----
