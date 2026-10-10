@@ -1,0 +1,49 @@
+---
+import { getAbsoluteLocaleUrl } from 'astro:i18n';
+import { LOCALES, HREFLANG, OG_LOCALE, DEFAULT_LOCALE, type Locale } from '../i18n/config.ts';
+
+interface Props {
+  locale: Locale;
+  /** Locale-independent path, e.g. '' or 'brands' or 'brands/cru-magazine'. */
+  path: string;
+  title: string;
+  description: string;
+  /** Social share image, relative to the site root. */
+  image?: string;
+}
+
+const { locale, path, title, description, image = '/og/default.jpg' } = Astro.props;
+
+const canonical = getAbsoluteLocaleUrl(locale, path);
+const ogImage = new URL(image, Astro.site).href;
+
+// One alternate per locale plus x-default, which points at the default locale.
+// Built from the helper so the unprefixed default-locale URL stays correct.
+const alternates = LOCALES.map((l) => ({
+  hreflang: HREFLANG[l],
+  href: getAbsoluteLocaleUrl(l, path),
+}));
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+{alternates.map((a) => (
+  <link rel="alternate" hreflang={a.hreflang} href={a.href} />
+))}
+<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(DEFAULT_LOCALE, path)} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Cru Media" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={OG_LOCALE[locale]} />
+{LOCALES.filter((l) => l !== locale).map((l) => (
+  <meta property="og:locale:alternate" content={OG_LOCALE[l]} />
+))}
+<meta property="og:image" content={ogImage} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />

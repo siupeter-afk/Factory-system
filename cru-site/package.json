@@ -1,0 +1,31 @@
+{
+  "name": "cru-media-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cru Media Limited — trilingual brand site (EN / 繁體 / 簡體)",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro",
+    "check:i18n": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-i18n.ts",
+    "verify": "npm run check:content && npm run check:i18n && npm run check && npm run build",
+    "check:content": "node scripts/check-content.mjs"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.8",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,130 @@
+---
+import { render } from 'astro:content';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import type { Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandAttribution from '../components/BrandAttribution.astro';
+import FallbackNotice from '../components/FallbackNotice.astro';
+import EventCard from '../components/EventCard.astro';
+import IssueCard from '../components/IssueCard.astro';
+import { localisedEntry, issuesForBrand, localisedEntries, eventStatus } from '../lib/collections.ts';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+const { locale, slug } = Astro.props;
+const t = useTranslations(locale);
+
+const found = await localisedEntry('brands', locale, slug);
+// Fails the build rather than shipping a broken page: the route set comes from
+// the default locale, so a missing entry means the content tree is inconsistent.
+if (!found) throw new Error(`Unknown brand slug: ${slug}`);
+const { entry, isFallback } = found;
+const d = entry.data;
+
+// render(entry) -- entry.render() was removed in Astro 6.
+const { Content } = await render(entry);
+
+const issues = await issuesForBrand(locale, slug);
+const events = (await localisedEntries('events', locale))
+  .filter((e) => e.entry.data.brandSlug === slug)
+  .map((e) => ({ ...e, status: eventStatus(e.entry.data) }))
+  .sort((a, b) => +b.entry.data.startDate - +a.entry.data.startDate);
+---
+<BaseLayout
+  locale={locale}
+  path={`brands/${slug}`}
+  title={d.seo?.title ?? d.title}
+  description={d.seo?.description ?? d.summary}
+  image={d.seo?.image}
+>
+  {isFallback && <FallbackNotice locale={locale} />}
+
+  <article class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
+    <a
+      href={getRelativeLocaleUrl(locale, 'brands')}
+      class="text-sm text-muted transition-colors hover:text-brass"
+    >
+      {t('common.backTo', { target: t('nav.brands') })}
+    </a>
+
+    <p class="eyebrow mt-8">{t(`brand.kind.${d.kind}`)}</p>
+    <h1 class="mt-3 font-display text-4xl font-semibold text-paper sm:text-5xl">{d.title}</h1>
+    <p class="mt-4 max-w-2xl text-lg text-paper-dim">{d.tagline}</p>
+
+    <BrandAttribution
+      locale={locale}
+      ownership={d.ownership}
+      licensedTerritory={d.licensedTerritory}
+      class="mt-5 text-sm"
+    />
+
+    {
+      d.website && (
+        <a
+          href={d.website}
+          rel="noopener noreferrer"
+          target="_blank"
+          class="mt-5 inline-block text-sm font-medium text-brass hover:text-brass-bright"
+        >
+          {t('brands.visit')}
+        </a>
+      )
+    }
+
+    {d.hero && <img src={d.hero} alt={d.heroAlt} class="mt-10 w-full rounded-xl border border-line" />}
+
+    <div class="rule mt-12 mb-10"></div>
+    <div class="prose"><Content /></div>
+
+    {
+      issues.length > 0 && (
+        <section class="mt-16">
+          <div class="rule mb-10"></div>
+          <h2 class="font-display text-2xl font-semibold text-paper">{t('issues.archive')}</h2>
+          <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {issues.map((i) => (
+              <IssueCard
+                locale={locale}
+                title={i.entry.data.title}
+                issueNumber={i.entry.data.issueNumber}
+                publishedAt={i.entry.data.publishedAt}
+                blurb={i.entry.data.blurb}
+                cover={i.entry.data.cover}
+                coverAlt={i.entry.data.coverAlt}
+                readUrl={i.entry.data.readUrl}
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      events.length > 0 && (
+        <section class="mt-16">
+          <div class="rule mb-10"></div>
+          <h2 class="font-display text-2xl font-semibold text-paper">{t('nav.events')}</h2>
+          <div class="mt-8 grid gap-5 sm:grid-cols-2">
+            {events.map((e) => (
+              <EventCard
+                locale={locale}
+                title={e.entry.data.title}
+                startDate={e.entry.data.startDate}
+                endDate={e.entry.data.endDate}
+                venue={e.entry.data.venue}
+                city={e.entry.data.city}
+                audience={e.entry.data.audience}
+                summary={e.entry.data.summary}
+                ticketUrl={e.entry.data.ticketUrl}
+                status={e.status}
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>

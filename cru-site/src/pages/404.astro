@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { LOCALES, BCP47, LOCALE_LABELS } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+
+// A static host serves ONE global 404 for every URL, so it cannot know which
+// language the visitor wanted. Rather than guessing, this renders all three
+// and needs no JavaScript to do it.
+const blocks = LOCALES.map((locale) => {
+  const t = useTranslations(locale);
+  return {
+    locale,
+    lang: BCP47[locale],
+    label: LOCALE_LABELS[locale],
+    title: t('notfound.title'),
+    body: t('notfound.body'),
+    home: getRelativeLocaleUrl(locale, ''),
+    homeLabel: t('nav.home'),
+  };
+});
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>404 — Cru Media</title>
+  </head>
+  <body>
+    <main class="mx-auto flex min-h-dvh max-w-xl flex-col justify-center gap-10 px-6 py-16">
+      <p class="font-display text-xl font-semibold text-paper">Cru&thinsp;Media</p>
+      {
+        blocks.map((b) => (
+          <section lang={b.lang}>
+            <h1 class="font-display text-lg font-semibold text-brass">{b.title}</h1>
+            <p class="mt-2 text-sm text-paper-dim">{b.body}</p>
+            <a
+              href={b.home}
+              class="mt-3 inline-block text-sm font-medium text-brass underline underline-offset-2"
+            >
+              {b.homeLabel} · {b.label}
+            </a>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>

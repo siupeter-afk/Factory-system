@@ -1,0 +1,41 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { LOCALES, LOCALE_LABELS, LOCALE_SHORT, BCP47, HREFLANG, type Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+
+interface Props {
+  locale: Locale;
+  /** Locale-independent path of the current page. */
+  path: string;
+}
+
+const { locale, path } = Astro.props;
+const t = useTranslations(locale);
+---
+<nav class="flex items-center gap-1" aria-label={t('locale.switch')}>
+  {
+    LOCALES.map((l) => {
+      // Always resolve through the helper. With prefixDefaultLocale: false the
+      // English URL has no prefix, so building '/en/...' by hand would 404.
+      const href = getRelativeLocaleUrl(l, path);
+      const isActive = l === locale;
+      return (
+        <a
+          href={href}
+          hreflang={HREFLANG[l]}
+          lang={BCP47[l]}
+          aria-current={isActive ? 'true' : undefined}
+          title={LOCALE_LABELS[l]}
+          class:list={[
+            'px-2 py-1 text-xs font-medium rounded transition-colors',
+            isActive
+              ? 'bg-brass text-ground'
+              : 'text-muted hover:text-paper hover:bg-line',
+          ]}
+        >
+          {LOCALE_SHORT[l]}
+        </a>
+      );
+    })
+  }
+</nav>

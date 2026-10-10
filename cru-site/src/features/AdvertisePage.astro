@@ -1,0 +1,53 @@
+---
+import type { Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { brandsFor } from '../lib/collections.ts';
+import { SITE } from '../config/site.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const brands = await brandsFor(locale);
+---
+<BaseLayout
+  locale={locale}
+  path="advertise"
+  title={t('advertise.title')}
+  description={t('advertise.intro')}
+>
+  <PageHeader eyebrow={t('site.name')} title={t('advertise.title')} intro={t('advertise.intro')} />
+
+  <section class="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+    <h2 class="font-display text-xl font-semibold text-paper">{t('advertise.reach')}</h2>
+    <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        brands.map((b) => (
+          <li class="rounded-xl border border-line bg-ground-raised p-5">
+            <p class="eyebrow">{t(`brand.kind.${b.entry.data.kind}`)}</p>
+            <p class="mt-2 font-display text-base font-semibold text-paper">{b.entry.data.title}</p>
+            {/* TODO — supply circulation / attendance figures per brand. */}
+            <p class="mt-2 text-xs text-muted">{t('common.todo')}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="mt-10 max-w-2xl text-sm leading-relaxed text-paper-dim">{t('advertise.body')}</p>
+
+    <a
+      href={SITE.mediaKitPath}
+      class="mt-6 inline-block rounded-lg border border-brass-dim px-5 py-2.5 text-sm font-medium text-brass transition-colors hover:bg-brass hover:text-ground"
+    >
+      {t('advertise.mediaKit')}
+    </a>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+    <div class="rule mb-10"></div>
+    <h2 class="font-display text-2xl font-semibold text-paper">{t('advertise.enquire')}</h2>
+    <div class="mt-8"><EnquiryForm locale={locale} /></div>
+  </section>
+</BaseLayout>

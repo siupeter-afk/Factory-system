@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+import { BCP47, type Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AgeGate from '../components/AgeGate.astro';
+
+interface Props {
+  locale: Locale;
+  /** Locale-independent path, e.g. '' or 'brands/cru-magazine'. */
+  path: string;
+  title: string;
+  description: string;
+  image?: string;
+}
+
+const { locale, path, title, description, image } = Astro.props;
+const t = useTranslations(locale);
+---
+<!doctype html>
+<html lang={BCP47[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e0b09" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <SEO locale={locale} path={path} title={title} description={description} image={image} />
+
+    {/* Must stay synchronous and inline: it runs before first paint so the
+        gate never flashes the page behind it. `is:inline` keeps Astro from
+        bundling and deferring it. */}
+    <script is:inline>
+      (function () {
+        var ok = false;
+        try {
+          ok = localStorage.getItem('cru-age-ok') === '1';
+        } catch (e) {
+          ok = false;
+        }
+        if (!ok) document.documentElement.classList.add('age-gate-pending');
+      })();
+    </script>
+  </head>
+  <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-brass focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-ground"
+    >
+      {t('nav.skipToContent')}
+    </a>
+
+    <div data-age-shielded>
+      <Header locale={locale} path={path} />
+      <main id="main">
+        <slot />
+      </main>
+      <Footer locale={locale} path={path} />
+    </div>
+
+    <AgeGate locale={locale} />
+  </body>
+</html>

@@ -1,0 +1,25 @@
+---
+import type { Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+import { LICENSED_TERRITORY_DEFAULT } from '../config/site.ts';
+
+interface Props {
+  locale: Locale;
+  ownership: 'own' | 'licensed';
+  licensedTerritory?: string | undefined;
+  class?: string | undefined;
+}
+
+const { locale, ownership, licensedTerritory, class: className } = Astro.props;
+const t = useTranslations(locale);
+
+// Rendered from the brand's `ownership` field, so a licensed title can never
+// appear without its attribution and an own title is never mislabelled.
+const label =
+  ownership === 'licensed'
+    ? t('brand.ownership.licensed', {
+        territory: licensedTerritory ?? LICENSED_TERRITORY_DEFAULT,
+      })
+    : t('brand.ownership.own');
+---
+<p class:list={['text-xs text-muted', className]}>{label}</p>

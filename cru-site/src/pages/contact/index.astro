@@ -1,0 +1,7 @@
+---
+// Route shim. All page logic lives in src/features/ContactPage.astro so that the
+// three locale trees never diverge; built-in i18n requires literal locale
+// directories, which would otherwise mean writing each page three times.
+import ContactPage from '../../features/ContactPage.astro';
+---
+<ContactPage locale="en" />

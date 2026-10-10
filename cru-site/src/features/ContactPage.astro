@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { SITE } from '../config/site.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+<BaseLayout locale={locale} path="contact" title={t('nav.contact')} description={t('contact.intro')}>
+  <PageHeader eyebrow={t('site.name')} title={t('nav.contact')} intro={t('contact.intro')} />
+
+  <section class="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+    <div class="grid gap-14 lg:grid-cols-2">
+      <div>
+        <h2 class="font-display text-xl font-semibold text-paper">{t('advertise.enquire')}</h2>
+        <div class="mt-6"><EnquiryForm locale={locale} /></div>
+      </div>
+
+      <dl class="grid gap-6 text-sm">
+        <div>
+          <dt class="text-muted">{t('form.email')}</dt>
+          <dd class="mt-1">
+            <a href={`mailto:${SITE.email}`} class="text-brass underline underline-offset-2">
+              {SITE.email}
+            </a>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-muted">{t('form.phone')}</dt>
+          <dd class="mt-1 text-paper">{SITE.phone}</dd>
+        </div>
+        <div>
+          <dt class="text-muted">{t('about.address')}</dt>
+          <dd class="mt-1 text-paper">{SITE.address}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</BaseLayout>

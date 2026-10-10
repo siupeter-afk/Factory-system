@@ -1,0 +1,75 @@
+---
+import type { Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+<div
+  class="age-gate fixed inset-0 z-50 items-center justify-center bg-ground-sunk/98 px-4 backdrop-blur-sm"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="age-gate-title"
+>
+  <div class="w-full max-w-md rounded-2xl border border-line-bright bg-ground-raised p-8 text-center shadow-2xl">
+    <div id="age-gate-ask">
+      <p class="eyebrow">{t('age.title')}</p>
+      <h2 id="age-gate-title" class="mt-3 font-display text-2xl font-semibold text-paper">
+        {t('age.question')}
+      </h2>
+      <p class="mt-4 text-sm leading-relaxed text-muted">{t('age.body')}</p>
+      <div class="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
+        <button
+          type="button"
+          id="age-gate-deny"
+          class="rounded-lg border border-line-bright px-5 py-2.5 text-sm font-medium text-paper-dim transition-colors hover:border-muted hover:text-paper"
+        >
+          {t('age.deny')}
+        </button>
+        <button
+          type="button"
+          id="age-gate-confirm"
+          class="rounded-lg bg-brass px-5 py-2.5 text-sm font-semibold text-ground transition-colors hover:bg-brass-bright"
+        >
+          {t('age.confirm')}
+        </button>
+      </div>
+      <p class="mt-6 text-xs text-muted">{t('age.note')}</p>
+    </div>
+
+    <div id="age-gate-denied" hidden>
+      <p class="font-display text-lg text-paper">{t('age.denied')}</p>
+      <p class="mt-4 text-xs text-muted">{t('age.note')}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'cru-age-ok';
+  const root = document.documentElement;
+  const confirmBtn = document.getElementById('age-gate-confirm');
+  const denyBtn = document.getElementById('age-gate-deny');
+  const ask = document.getElementById('age-gate-ask');
+  const denied = document.getElementById('age-gate-denied');
+
+  confirmBtn?.addEventListener('click', () => {
+    // A blocked localStorage (private mode, blocked site data) must not lock a
+    // visitor out: the write is best-effort and passage is granted regardless.
+    // Such a visitor sees the gate again on the next load, which is correct.
+    try {
+      localStorage.setItem(STORAGE_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+    root.classList.remove('age-gate-pending');
+  });
+
+  denyBtn?.addEventListener('click', () => {
+    if (ask) ask.hidden = true;
+    if (denied) denied.hidden = false;
+  });
+</script>

@@ -1,0 +1,68 @@
+# GitHub Pages deploy workflow -- INERT TEMPLATE, NOT ACTIVE.
+#
+# This file deliberately lives in cru-site/deploy/ and NOT in
+# .github/workflows/. GitHub only runs workflows found in .github/workflows/,
+# so while it sits here it cannot run.
+#
+# Why that matters: GitHub Pages serves ONE site per repository, and the parent
+# repository already spends its Pages slot on an unrelated project. If this
+# workflow were active there, deploying this site would overwrite that one.
+#
+# To activate, AFTER extracting cru-site/ into its own repository:
+#   mkdir -p .github/workflows
+#   git mv deploy/github-pages.yml .github/workflows/deploy.yml
+#   # then set Settings -> Pages -> Source: GitHub Actions
+#
+# Also note: a GitHub Pages *project* site (served from /<repo>/) cannot serve
+# a root /robots.txt, since crawlers only read it from the domain root. Use a
+# custom domain (www.crumedia.net) or a <user>.github.io repo for production.
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # 03:17 Hong Kong. An event's upcoming/past state is derived from its dates
+    # at BUILD time, so without a periodic rebuild a finished event would stay
+    # under "Upcoming" until the next content change.
+    - cron: '17 19 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Content and translation consistency are checked before anything ships.
+      - run: npm run check:content
+      - run: npm run check:i18n
+      - run: npm run check
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

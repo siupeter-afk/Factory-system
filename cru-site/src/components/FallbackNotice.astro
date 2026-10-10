@@ -1,0 +1,23 @@
+---
+import type { Locale } from '../i18n/config.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+
+// Shown when a page exists in English but not yet in the requested language.
+// The route still exists in every locale, which is what keeps the hreflang set
+// reciprocal and stops the language switcher 404ing.
+const NOTICE: Record<Locale, string> = {
+  en: '',
+  'zh-hant': '此頁面尚未有中文版本，以下顯示英文內容。',
+  'zh-hans': '此页面尚未有中文版本，以下显示英文内容。',
+};
+const text = NOTICE[locale];
+---
+{
+  text && (
+    <p class="border-b border-line bg-ground-raised px-4 py-3 text-center text-xs text-muted">
+      {text}
+    </p>
+  )
+}

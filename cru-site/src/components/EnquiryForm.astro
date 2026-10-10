@@ -1,0 +1,103 @@
+---
+import type { Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+import { SITE } from '../config/site.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+/**
+ * A static host has no backend, so the POST target is configurable in
+ * src/config/site.ts:
+ *   'netlify'  -- Netlify Forms picks the form up from the deployed HTML.
+ *   'endpoint' -- plain POST to SITE.formEndpoint (Formspree, Web3Forms, ...).
+ *   'mailto'   -- no POST target at all; only the email fallback is shown.
+ *
+ * The form is a plain <form method="POST">, so it works with JavaScript
+ * disabled. The mailto: fallback is rendered in every mode, so the page is
+ * never a dead end even if the provider is misconfigured.
+ */
+const isNetlify = SITE.formMode === 'netlify';
+const isEndpoint = SITE.formMode === 'endpoint' && SITE.formEndpoint !== '';
+const canPost = isNetlify || isEndpoint;
+
+const FIELD =
+  'mt-1.5 w-full rounded-lg border border-line-bright bg-ground px-3 py-2.5 text-sm text-paper placeholder:text-muted focus:border-brass focus:outline-none';
+const LABEL = 'block text-sm font-medium text-paper-dim';
+
+const interests = [
+  'form.interest.advertising',
+  'form.interest.sponsorship',
+  'form.interest.exhibiting',
+  'form.interest.editorial',
+  'form.interest.other',
+] as const;
+---
+{
+  canPost && (
+    <form
+      name="enquiry"
+      method="POST"
+      action={isEndpoint ? SITE.formEndpoint : undefined}
+      data-netlify={isNetlify ? 'true' : undefined}
+      data-netlify-honeypot={isNetlify ? 'bot-field' : undefined}
+      class="grid max-w-xl gap-5"
+    >
+      {/* Netlify needs this hidden field to match a statically-rendered form. */}
+      {isNetlify && <input type="hidden" name="form-name" value="enquiry" />}
+      {/* Honeypot: hidden from people, tempting to bots. */}
+      <p hidden>
+        <label>
+          bot-field
+          <input name="bot-field" />
+        </label>
+      </p>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class={LABEL} for="f-name">{t('form.name')}</label>
+          <input id="f-name" name="name" type="text" required autocomplete="name" class={FIELD} />
+        </div>
+        <div>
+          <label class={LABEL} for="f-company">{t('form.company')}</label>
+          <input id="f-company" name="company" type="text" autocomplete="organization" class={FIELD} />
+        </div>
+        <div>
+          <label class={LABEL} for="f-email">{t('form.email')}</label>
+          <input id="f-email" name="email" type="email" required autocomplete="email" class={FIELD} />
+        </div>
+        <div>
+          <label class={LABEL} for="f-phone">{t('form.phone')}</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" class={FIELD} />
+        </div>
+      </div>
+
+      <div>
+        <label class={LABEL} for="f-interest">{t('form.interest')}</label>
+        <select id="f-interest" name="interest" class={FIELD}>
+          {interests.map((key) => <option value={key.split('.').pop()}>{t(key)}</option>)}
+        </select>
+      </div>
+
+      <div>
+        <label class={LABEL} for="f-message">{t('form.message')}</label>
+        <textarea id="f-message" name="message" rows="5" required class={FIELD}></textarea>
+      </div>
+
+      <button
+        type="submit"
+        class="justify-self-start rounded-lg bg-brass px-5 py-2.5 text-sm font-semibold text-ground transition-colors hover:bg-brass-bright"
+      >
+        {t('form.submit')}
+      </button>
+    </form>
+  )
+}
+
+<p class="mt-6 text-sm text-muted">
+  {t('form.orEmail')}{' '}
+  <a href={`mailto:${SITE.email}`} class="text-brass underline underline-offset-2 hover:text-brass-bright">
+    {SITE.email}
+  </a>
+</p>

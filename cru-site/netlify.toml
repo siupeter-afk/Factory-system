@@ -1,0 +1,21 @@
+# Netlify build configuration.
+#
+# Inert until this directory is connected to a Netlify site, so it is safe to
+# commit alongside the rest of the repository.
+#
+# `base` assumes cru-site/ is still a subdirectory of its parent repository.
+# Once this folder is extracted to its own repo, change base to "." (or delete
+# the line) and set publish to "dist".
+
+[build]
+  base    = "cru-site"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22.12.0"
+
+# Astro already emits directory-style URLs; letting Netlify rewrite them too
+# would produce two competing notions of the canonical URL.
+[build.processing.html]
+  pretty_urls = false

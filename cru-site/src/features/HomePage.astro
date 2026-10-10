@@ -1,0 +1,104 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import type { Locale } from '../i18n/config.ts';
+import { useTranslations } from '../i18n/ui.ts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandCard from '../components/BrandCard.astro';
+import EventCard from '../components/EventCard.astro';
+import { brandsFor, eventsByStatus } from '../lib/collections.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const brands = await brandsFor(locale);
+const { upcoming } = await eventsByStatus(locale);
+const nextEvents = upcoming.slice(0, 2);
+---
+<BaseLayout
+  locale={locale}
+  path=""
+  title={`${t('site.name')} — ${t('site.tagline')}`}
+  description={t('site.tagline')}
+>
+  <section class="mx-auto max-w-7xl px-4 pt-20 pb-16 sm:px-6 sm:pt-28">
+    <p class="eyebrow">{t('site.tagline')}</p>
+    <h1 class="mt-5 font-display text-5xl font-semibold text-paper sm:text-display">
+      Cru&thinsp;Media
+    </h1>
+    <p class="mt-6 max-w-2xl text-lg leading-relaxed text-paper-dim">
+      {/* TODO — supply the company positioning statement for the hero. */}
+      {t('common.todo')}
+    </p>
+    <div class="mt-9 flex flex-wrap gap-3">
+      <a
+        href={getRelativeLocaleUrl(locale, 'advertise')}
+        class="rounded-lg bg-brass px-5 py-2.5 text-sm font-semibold text-ground transition-colors hover:bg-brass-bright"
+      >
+        {t('advertise.enquire')}
+      </a>
+      <a
+        href={getRelativeLocaleUrl(locale, 'brands')}
+        class="rounded-lg border border-line-bright px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:border-brass-dim"
+      >
+        {t('brand.viewAll')}
+      </a>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+    <div class="rule mb-10"></div>
+    <h2 class="font-display text-2xl font-semibold text-paper">{t('brands.title')}</h2>
+    <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        brands.map((b) => (
+          <BrandCard
+            locale={locale}
+            slug={b.slug}
+            title={b.entry.data.title}
+            kind={b.entry.data.kind}
+            tagline={b.entry.data.tagline}
+            ownership={b.entry.data.ownership}
+            licensedTerritory={b.entry.data.licensedTerritory}
+            logo={b.entry.data.logo}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+    <div class="rule mb-10"></div>
+    <div class="flex items-baseline justify-between gap-4">
+      <h2 class="font-display text-2xl font-semibold text-paper">{t('events.upcoming')}</h2>
+      <a
+        href={getRelativeLocaleUrl(locale, 'events')}
+        class="text-sm font-medium text-brass hover:text-brass-bright"
+      >
+        {t('common.viewAll')}
+      </a>
+    </div>
+    {
+      nextEvents.length > 0 ? (
+        <div class="mt-8 grid gap-5 sm:grid-cols-2">
+          {nextEvents.map((e) => (
+            <EventCard
+              locale={locale}
+              title={e.entry.data.title}
+              startDate={e.entry.data.startDate}
+              endDate={e.entry.data.endDate}
+              venue={e.entry.data.venue}
+              city={e.entry.data.city}
+              audience={e.entry.data.audience}
+              summary={e.entry.data.summary}
+              ticketUrl={e.entry.data.ticketUrl}
+              status={e.status}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="mt-8 text-sm text-muted">{t('events.empty')}</p>
+      )
+    }
+  </section>
+</BaseLayout>

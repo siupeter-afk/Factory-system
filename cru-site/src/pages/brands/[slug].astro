@@ -1,0 +1,16 @@
+---
+// Route shim for one brand. The route SET comes from the default locale (see
+// slugsOf), so all three locale trees expose identical URLs -- which is what
+// lets every page promise its hreflang alternates exist.
+import BrandPage from '../../features/BrandPage.astro';
+import { slugsOf } from '../../lib/collections.ts';
+
+export async function getStaticPaths() {
+  // No Astro.* in here (deprecated in Astro 6) and params must be strings.
+  const slugs = await slugsOf('brands');
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params as { slug: string };
+---
+<BrandPage locale="en" slug={slug} />
